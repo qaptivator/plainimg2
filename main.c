@@ -30,6 +30,9 @@ struct AppState {
     bool useBlackBg;
     bool alwaysOnTop;
     bool useAntialiasing;
+
+    bool dragging;
+    int dragX, dragY;
 };
 //typedef struct _appstate AppState;
 
@@ -153,6 +156,9 @@ int main(int argc, char* argv[]) {
     state.alwaysOnTop = true;
     state.useAntialiasing = false;
     state.quitApp = false;
+    state.dragging = false;
+    state.dragX = 0;
+    state.dragY = 0;
 
     SDL_FRect _textureRect;
     state.textureRect = &_textureRect;
@@ -216,6 +222,33 @@ int main(int argc, char* argv[]) {
                         GetCursorPos(pt);
                         showContextMenu(&state, pt->x, pt->y);
                         //showContextMenu(&state, event.button.x, event.button.y);
+                    }
+                    if (event.button.button == SDL_BUTTON_LEFT) {
+                        state.dragging = true;
+                        state.dragX = event.button.x;
+                        state.dragY = event.button.y;
+                    }
+                    break;
+                
+                case SDL_EVENT_MOUSE_BUTTON_UP:
+                    if (event.button.button == SDL_BUTTON_LEFT) {
+                        state.dragging = false;
+                    }
+                    break;
+
+                // https://stackoverflow.com/questions/7773771/how-do-i-implement-dragging-a-window-using-its-client-area
+                case SDL_EVENT_MOUSE_MOTION:
+                    if (state.dragging) {
+                        int deltaX = event.motion.x - state.dragX;
+                        int deltaY = event.motion.y - state.dragY;
+
+                        //int windowX, windowY;
+                        //SDL_GetWindowPosition(state.window, &windowX, &windowY);
+
+                        SDL_SetWindowPosition(state.window, event.motion.x - deltaX, event.motion.y - deltaY); // windowX + deltaX, windowY + deltaY
+
+                        state.dragX = event.motion.x;
+                        state.dragY = event.motion.y;
                     }
                     break;
 
