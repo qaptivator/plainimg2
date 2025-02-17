@@ -258,6 +258,16 @@ bool eventFilter(void *userdata, SDL_Event *event) {
     return 1;
 }
 
+void setImagePath(struct AppState *state, const char *str) {
+    char *newMemory = realloc(state->imagePath, (strlen(str) + 1) * sizeof(char));
+    if (state->imagePath == NULL) {
+        SDL_Log("Memory allocation failed for imagePath during realloc\n");
+        return;
+    }
+    state->imagePath = newMemory;
+    strcpy(state->imagePath, str);
+}
+
 int main(int argc, char* argv[]) {
     // ----- INIT -----
     struct AppState state;
@@ -276,12 +286,17 @@ int main(int argc, char* argv[]) {
     SDL_FRect _textureRect;
     state.textureRect = &_textureRect;
 
-    state.imagePath = malloc(100 * sizeof(char));
+    state.imagePath = malloc(1 * sizeof(char));
     if (state.imagePath == NULL) {
-        SDL_Log("Memory allocation failed\n");
+        SDL_Log("Memory allocation failed for imagePath during malloc\n");
         return 1;
     }
-    strcpy(state.imagePath, IMG_PATH);
+
+    if (argc > 1) {
+        
+    }
+    char mystr[100] = IMG_PATH;
+    setImagePath(&state, mystr);
 
     int result = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     if (result < 0) {
