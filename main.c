@@ -106,7 +106,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
             break;
         case 6:
             state->useBlackBg = !state->useBlackBg;
-            break; // omg i forgot a break statement here and it almost broke the logic
+            break;
         case 7:
             state->useAntialiasing = !state->useAntialiasing;
             updateUseAntialiasing(state);
@@ -196,7 +196,10 @@ int main(int argc, char* argv[]) {
 
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
                     if (event.button.button == SDL_BUTTON_RIGHT) {
-                        showContextMenu(&state, event.button.x, event.button.y);
+                        LPPOINT pt;
+                        GetCursorPos(pt);
+                        showContextMenu(&state, pt->x, pt->y);
+                        //showContextMenu(&state, event.button.x, event.button.y);
                     }
                     break;
 
