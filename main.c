@@ -145,6 +145,24 @@ void showContextMenu(struct AppState *state, int x, int y) {
 void showContextMenu(struct AppState *state, int x, int y) {}
 #endif
 
+void drawFrame(struct AppState *state) {
+
+}
+
+// https://stackoverflow.com/questions/7106586/keep-window-active-while-being-dragged-sdl-on-win32
+// https://wiki.libsdl.org/SDL3/SDL_EventFilter
+// https://wiki.libsdl.org/SDL3/SDL_SetEventFilter
+bool eventFilter(void *userdata, const SDL_Event *event)
+{
+    if (event->type == SDL_EVENT_WINDOW_RESIZED) {
+        struct AppState *state = (struct AppState*)userdata;
+        // Note: NULL rectangle is the entire window
+        SDL_RenderSetViewport(state->renderer, NULL);
+        drawFrame(state);
+    }
+    return 1;
+}
+
 int main(int argc, char* argv[]) {
     // ----- INIT -----
     struct AppState state;
@@ -201,6 +219,7 @@ int main(int argc, char* argv[]) {
         return -4;
     }
 
+    SDL_SetEventFilter(eventFilter, &state);
     updateAlwaysOnTop(&state);
     updateUseAntialiasing(&state);
     //SDL_Log("SDL3 initialized");
