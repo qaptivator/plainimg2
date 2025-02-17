@@ -30,11 +30,14 @@ you can also make the window be always an top, so its actually usable (inspired 
 at first, i made this in python, but pyinstaller executables were always flagged by antiviruses, so i decided to remake the project in C with SDL.
 this not only makes the project not false flagged by antiviruses, but also more lightweight!
 
+licensed under MIT.
+
 # build
 
 - SDL3 is included inside this repository, so just clone this repository
 - you need vs c/c++ redistributable and gcc installed
 - run `./build.sh`, and it will build everything for you with gcc. run with `./plainIMG.exe` (or `./build.sh && ./plainIMG.exe` for short)
+- if youre not building with standalone version, you NEED to have `SDL3.dll`, `SDL3_image.dll` and `icon.ico` located in the same directory as the executable
 
 # todo list
 
