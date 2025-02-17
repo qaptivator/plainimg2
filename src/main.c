@@ -22,7 +22,7 @@ struct AppState {
     SDL_Renderer *renderer;
     SDL_Texture *texture;
     SDL_FRect *textureRect;
-    char *imagePath;
+    //char *imagePath;
     bool textureLoaded;
     bool quitApp;
 
@@ -58,29 +58,38 @@ void updateAlwaysOnTop(struct AppState *state) {
 }
 
 void updateUseAntialiasing(struct AppState *state) {
-    SDL_SetTextureScaleMode(state->texture, state->useAntialiasing ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
+    if (state->textureLoaded) {
+        SDL_SetTextureScaleMode(state->texture, state->useAntialiasing ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
+    }
 }
 
 void resizeWindowToImage(struct AppState *state) {
-    if (state->keepAspectRatio && state->textureRect->w > 0 && state->textureRect->h > 0) {
+    if (state->textureLoaded && state->keepAspectRatio && state->textureRect->w > 0 && state->textureRect->h > 0) {
         SDL_SetWindowSize(state->window, state->textureRect->w, state->textureRect->w);
     }
 }
 
 #ifdef _WIN32
 #include <windows.h>
-void showContextMenu(struct AppState *state, int x, int y) {
-    SDL_PropertiesID props = SDL_GetWindowProperties(state->window);
+
+HWND getHwndFromWindow(SDL_Window *window) {
+    SDL_PropertiesID props = SDL_GetWindowProperties(window);
     if (props == 0) {
         SDL_Log("Failed to obtain SDL window properties.");
-        return;
+        return NULL;
     }
 
     HWND hwnd = (HWND)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
     if (hwnd == NULL) {
         SDL_Log("Failed to obtain hwnd from SDL window props.");
-        return;
+        return NULL;
     }
+
+    return hwnd;
+}
+
+void showContextMenu(struct AppState *state, int x, int y) {
+    HWND hwnd = getHwndFromWindow(state->window);
 
     HMENU hMenu = CreatePopupMenu();
     if (hMenu == NULL) {
@@ -143,6 +152,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
 #else
 // context menu unsuported for other platforms, for now
 void showContextMenu(struct AppState *state, int x, int y) {}
+HWND getHwndFromWindow(SDL_Window *window) {}
 #endif
 
 void drawFrame(struct AppState *state) {
@@ -150,23 +160,25 @@ void drawFrame(struct AppState *state) {
     SDL_SetRenderDrawColor(state->renderer, _bgColor, _bgColor, _bgColor, 0xff);
     SDL_RenderClear(state->renderer);
 
-    if (state->keepAspectRatio) {
-        int _windowWidth, _windowHeight;
-        SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
-        int _textureWidth = state->texture->w;
-        int _textureHeight = state->texture->h;
+    if (state->textureLoaded) {
+        if (state->keepAspectRatio) {
+            int _windowWidth, _windowHeight;
+            SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
+            int _textureWidth = state->texture->w;
+            int _textureHeight = state->texture->h;
 
-        float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
+            float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
 
-        state->textureRect->w = (int)(_textureWidth * _scale);
-        state->textureRect->h = (int)(_textureHeight * _scale);
-        state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
-        state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+            state->textureRect->w = (int)(_textureWidth * _scale);
+            state->textureRect->h = (int)(_textureHeight * _scale);
+            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
 
-        SDL_RenderTexture(state->renderer, state->texture, NULL, state->textureRect);
-    } else {
-        SDL_RenderTexture(state->renderer, state->texture, NULL, NULL);
-    }
+            SDL_RenderTexture(state->renderer, state->texture, NULL, state->textureRect);
+        } else {
+            SDL_RenderTexture(state->renderer, state->texture, NULL, NULL);
+        }
+    } else {}
 
     SDL_RenderPresent(state->renderer);
     SDL_Delay(1);
@@ -258,36 +270,35 @@ bool eventFilter(void *userdata, SDL_Event *event) {
     return 1;
 }
 
-void setImagePath(struct AppState *state, const char *str) {
-    SDL_IOStream *stream = SDL_IOFromFile(str, "r");
+void openImage(struct AppState *state, const char *path) {
+    HWND hwnd = getHwndFromWindow(state->window);
+
+    // close SDL_IOStream with SDL_CloseIO(stream);
+    SDL_IOStream *stream = SDL_IOFromFile(path, "r");
     if (stream == NULL) {
         // file doesnt exist
         state->textureLoaded = false;
-        return;
-    } else {
         SDL_CloseIO(stream);
-    }
-
-    char *newPath = realloc(state->imagePath, (strlen(str) + 1) * sizeof(char));
-    if (newPath == NULL) {
-        SDL_Log("Memory allocation failed for imagePath during realloc\n");
         return;
     }
 
-    SDL_Texture *newTexture = IMG_LoadTexture(state->renderer, newPath);
-    if (newTexture == NULL) {
-        // the issue is that it was a webp file, even though it was png extension
-        // im getting this weird error for low resolution image (terrain.png):
-        // Failed loading libwebpdemux-2.dll: The specified module could not be found.
-        // https://stackoverflow.com/questions/67082153/pygame-installed-on-windows-getting-pygame-error-failed-loading-libwebp-7-dll
-        // https://stackoverflow.com/questions/74526664/sdl2-problems-with-webp-animated-images-works-with-gifs-but-not-with-webp
-        // source code for IMG_LoadTexture: https://github.com/libsdl-org/SDL_image/blob/9ce9650a2bf8cf1c95d77ce8c5ce0a54f4ccbed4/src/IMG.c#L203
-        SDL_Log("IMG_LoadTexture error at setImagePath: %s", SDL_GetError());
-        return -4;
+    if (IMG_isWEBP(stream)) {
+        SDL_Log("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image.");
+        MessageBox(hwnd, TEXT("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image."), TEXT("plainIMG Error"), MB_OK | MB_ICONERROR);
+        state->textureLoaded = false;
+        SDL_CloseIO(stream);
+        return;
     }
 
-    state->imagePath = newPath;
-    strcpy(state->imagePath, str);
+    // the last option automatically closes the stream
+    SDL_Texture *newTexture = IMG_LoadTexture_IO(state->renderer, stream, true);
+    if (newTexture == NULL) {
+        // SDL3_image CANNOT parse webp files. or else you get this error:
+        // Failed loading libwebpdemux-2.dll: The specified module could not be found.
+        SDL_Log("IMG_LoadTexture error at setImagePath: %s", SDL_GetError());
+        return;
+    }
+
     state->texture = newTexture;
     state->textureLoaded = true;
 }
@@ -311,21 +322,14 @@ int main(int argc, char* argv[]) {
     SDL_FRect _textureRect;
     state.textureRect = &_textureRect;
 
-    state.imagePath = malloc(1 * sizeof(char));
-    if (state.imagePath == NULL) {
-        SDL_Log("Memory allocation failed for imagePath during malloc\n");
-        return 1;
-    }
-    if (argc > 1) {
-        setImagePath(&state, argv[1]);
-    }
-
+    // init
     int result = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     if (result < 0) {
         SDL_Log("SDL_Init error: %s", SDL_GetError());
         return -1;
     }
 
+    // window
     state.window = SDL_CreateWindow("plainIMG", W_WIDTH, W_HEIGHT, SDL_WINDOW_RESIZABLE); // SDL_WINDOW_RESIZABLE or 0
     if (state.window == NULL) {
         SDL_Log("SDL_CreateWindow error: %s", SDL_GetError());
@@ -333,18 +337,24 @@ int main(int argc, char* argv[]) {
     }
     SDL_SetWindowMinimumSize(state.window, WMIN_WIDTH, WMIN_HEIGHT);
 
+    // renderer
     state.renderer = SDL_CreateRenderer(state.window, NULL);
     if (state.renderer == NULL) {
         SDL_Log("SDL_CreateRenderer error: %s", SDL_GetError());
         return -3;
     }
 
+    // other
     SDL_SetEventFilter(&eventFilter, &state);
     updateAlwaysOnTop(&state);
     updateUseAntialiasing(&state);
-    //SDL_Log("SDL3 initialized");
+    // SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
+
+    if (argc > 1) {
+        openImage(&state, argv[1]);
+    }
 
     SDL_Event event;
     while (!state.quitApp) {
@@ -362,7 +372,7 @@ int main(int argc, char* argv[]) {
     SDL_DestroyWindow(state.window);
     //IMG_Quit();
     SDL_Quit();
-    free(state.imagePath);
+    //free(state.imagePath);
 
     return 0;
 }
