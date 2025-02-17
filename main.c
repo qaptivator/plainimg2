@@ -147,8 +147,9 @@ int main(int argc, char* argv[]) {
         return -3;
     }
 
-    /*state.texture = IMG_LoadTexture(state.renderer, state.imagePath);
+    state.texture = IMG_LoadTexture(state.renderer, state.imagePath);
     if (state.texture == NULL) {
+        // the issue is that it was a webp file, even though it was png extension
         // im getting this weird error for low resolution image (terrain.png):
         // Failed loading libwebpdemux-2.dll: The specified module could not be found.
         // https://stackoverflow.com/questions/67082153/pygame-installed-on-windows-getting-pygame-error-failed-loading-libwebp-7-dll
@@ -158,7 +159,7 @@ int main(int argc, char* argv[]) {
         //SDL_Log("IMG_LoadTexture error: %s", IMG_GetError());
         //SDL_Log("IMG_LoadTexture error:");
         return -4;
-    }*/
+    }
     /*SDL_Surface* img = IMG_Load(IMG_PATH);
     if (!img) {
         SDL_Log("IMG_Load: %s", SDL_GetError());
