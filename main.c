@@ -23,6 +23,7 @@ struct AppState {
     SDL_Renderer *renderer;
     SDL_Texture *texture;
     char *imagePath;
+    bool quitApp;
 
     bool keepAspectRatio;
     bool useBlackBg;
@@ -114,7 +115,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
             updateUseAntialiasing(state);
             break;
         case 8:
-            int _buttonId = MessageBox(hwnd, TEXT( "The driver is sleeping!!" ), TEXT( "Message" ), MB_OKCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON2);
+            int _buttonId = MessageBox(hwnd, TEXT("plainIMG. as simple as it gets for an image viewer. made by qaptivator, licensed under MIT. to see the GitHub repository, click 'OK'"), TEXT( "About plainIMG" ), MB_OKCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON2);
             SDL_Log("_buttonId: %d", _buttonId);
             if (_buttonId == 1) {
                 //system("open https://github.com/qaptivator/plainimg");
@@ -122,6 +123,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
             }
             break;
         case 9:
+            state->quitApp = true;
             break;
     }
 
@@ -142,6 +144,7 @@ int main(int argc, char* argv[]) {
     state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
     state.alwaysOnTop = true;
     state.useAntialiasing = false;
+    state.quitApp = false;
 
     state.imagePath = malloc(100 * sizeof(char));
     if (state.imagePath == NULL) {
@@ -197,12 +200,11 @@ int main(int argc, char* argv[]) {
     // bug: the image only resizes when i stop dragging (unhold the mouse button)
 
     SDL_Event event;
-    int quit = 0;
-    while (!quit) {
+    while (!state.quitApp) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_EVENT_QUIT:
-                    quit = 1;
+                    state.quitApp = true;
                     break;
 
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -218,7 +220,7 @@ int main(int argc, char* argv[]) {
                     switch (event.key.key) {
                         case SDLK_Q:
                         case SDLK_ESCAPE:
-                            quit = 1;
+                            state.quitApp = true;
                             break;
 
                         case SDLK_A:
