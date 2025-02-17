@@ -25,6 +25,7 @@ struct AppState {
     bool useBlackBg;
     bool alwaysOnTop;
 };
+//typedef struct _appstate AppState;
 
 int min(int a, int b) {
     return (a < b) ? a : b;
@@ -40,6 +41,51 @@ float minf(float a, float b) {
 
 float maxf(float a, float b) {
     return (a > b) ? a : b;
+}
+
+#include <windows.h>
+void showContextMenu(struct AppState *state, int x, int y) {
+    HMENU hMenu = CreatePopupMenu();
+
+    AppendMenu(hMenu, MF_STRING, 1, "Open Image... (O)");
+    AppendMenu(hMenu, MF_STRING, 2, "Close Image (C)");
+    AppendMenu(hMenu, MF_STRING, 3, "Window always on top (T)");
+    AppendMenu(hMenu, MF_STRING, 4, "Keep aspect ratio (A)");
+    AppendMenu(hMenu, MF_STRING, 5, "Resize window to image (R)");
+    AppendMenu(hMenu, MF_STRING, 6, "Use black background (B)");
+    AppendMenu(hMenu, MF_STRING, 7, "Use antialiasing (L)");
+    AppendMenu(hMenu, MF_STRING, 8, "Quit (Q)");
+
+    int itemId = TrackPopupMenu(hMenu, TPM_LEFTALIGN, x, y, 0, GetConsoleWindow(), NULL);
+
+    switch (itemId) {
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            state->alwaysOnTop = !state->alwaysOnTop;
+            updateAlwaysOnTop(&state);
+            break;
+        case 4:
+            state->keepAspectRatio = !state->keepAspectRatio;
+            break;
+        case 5:
+            break;
+        case 6:
+            state->useBlackBg = !state->useBlackBg;
+        case 7:
+            break;
+        case 8:
+            break;
+    }
+
+    DestroyMenu(hMenu);
+}
+
+void updateAlwaysOnTop(struct AppState *state) {
+    SDL_SetWindowAlwaysOnTop(state->window, state->alwaysOnTop);
+    SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
 }
 
 int main(int argc, char* argv[]) {
@@ -84,8 +130,7 @@ int main(int argc, char* argv[]) {
         return -4;
     }
 
-    SDL_SetWindowAlwaysOnTop(state.window, state.alwaysOnTop);
-    SDL_SetWindowTitle(state.window, state.alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
+    updateAlwaysOnTop(&state);
     SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
@@ -98,6 +143,12 @@ int main(int argc, char* argv[]) {
             switch (event.type) {
                 case SDL_EVENT_QUIT:
                     quit = 1;
+                    break;
+
+                case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                    if (event.button.button == SDL_BUTTON_RIGHT) {
+                        showContextMenu(&state, event.button.x, event.button.y);
+                    }
                     break;
 
                 case SDL_EVENT_KEY_DOWN:
@@ -117,8 +168,7 @@ int main(int argc, char* argv[]) {
 
                         case SDLK_T:
                             state.alwaysOnTop = !state.alwaysOnTop;
-                            SDL_SetWindowAlwaysOnTop(state.window, state.alwaysOnTop);
-                            SDL_SetWindowTitle(state.window, state.alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
+                            updateAlwaysOnTop(&state);
                             break;
                     }
                     break;

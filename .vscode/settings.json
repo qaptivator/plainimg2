@@ -1,6 +1,0 @@
-{
-	"files.associations": {
-		"cstdlib": "c",
-		"sdl_main.h": "c"
-	}
-}
