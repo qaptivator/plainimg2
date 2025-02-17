@@ -3,6 +3,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include "include/plainIMG_utils.h"
 
 #define W_WIDTH 800
 #define W_HEIGHT 600
@@ -78,6 +79,7 @@ int main(int argc, char* argv[]) {
         return -4;
     }
 
+    setWindowAlwaysOnTop(state.window, true);
     SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
