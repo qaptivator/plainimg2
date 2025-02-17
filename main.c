@@ -172,11 +172,85 @@ void drawFrame(struct AppState *state) {
     SDL_Delay(1);
 }
 
+void handleEvent(struct AppState *state, SDL_Event *event) {
+    switch (event->type) {
+        case SDL_EVENT_QUIT:
+            state->quitApp = true;
+            break;
+
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            if (event->button.button == SDL_BUTTON_RIGHT) {
+                LPPOINT pt;
+                GetCursorPos(pt);
+                showContextMenu(&state, pt->x, pt->y);
+                //showContextMenu(&state, event->button.x, event->button.y);
+            }
+            if (event->button.button == SDL_BUTTON_LEFT) {
+                state->dragging = true;
+                state->dragX = event->button.x;
+                state->dragY = event->button.y;
+            }
+            break;
+        
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            if (event->button.button == SDL_BUTTON_LEFT) {
+                state->dragging = false;
+            }
+            break;
+
+        // https://stackoverflow.com/questions/7773771/how-do-i-implement-dragging-a-window-using-its-client-area
+        case SDL_EVENT_MOUSE_MOTION:
+            if (state->dragging) {
+                int deltaX = event->motion.x - state->dragX;
+                int deltaY = event->motion.y - state->dragY;
+
+                //int windowX, windowY;
+                //SDL_GetWindowPosition(state->window, &windowX, &windowY);
+
+                SDL_SetWindowPosition(state->window, event->motion.x - deltaX, event->motion.y - deltaY); // windowX + deltaX, windowY + deltaY
+
+                state->dragX = event->motion.x;
+                state->dragY = event->motion.y;
+            }
+            break;
+
+        case SDL_EVENT_KEY_DOWN:
+            switch (event->key.key) {
+                case SDLK_Q:
+                case SDLK_ESCAPE:
+                    state->quitApp = true;
+                    break;
+
+                case SDLK_A:
+                    state->keepAspectRatio = !state->keepAspectRatio;
+                    break;
+
+                case SDLK_B:
+                    state->useBlackBg = !state->useBlackBg;
+                    break;
+
+                case SDLK_T:
+                    state->alwaysOnTop = !state->alwaysOnTop;
+                    updateAlwaysOnTop(&state);
+                    break;
+
+                case SDLK_L:
+                    state->useAntialiasing = !state->useAntialiasing;
+                    updateUseAntialiasing(&state);
+                    break;
+
+                case SDLK_R:
+                    resizeWindowToImage(&state);
+                    break;
+            }
+            break;
+    }
+}
+
 // https://stackoverflow.com/questions/7106586/keep-window-active-while-being-dragged-sdl-on-win32
 // https://wiki.libsdl.org/SDL3/SDL_EventFilter
 // https://wiki.libsdl.org/SDL3/SDL_SetEventFilter
-bool eventFilter(void *userdata, SDL_Event *event)
-{
+bool eventFilter(void *userdata, SDL_Event *event) {
     if (event->type == SDL_EVENT_WINDOW_RESIZED) {
         struct AppState *state = (struct AppState*)userdata;
         // Note: NULL rectangle is the entire window
@@ -252,80 +326,8 @@ int main(int argc, char* argv[]) {
     SDL_Event event;
     while (!state.quitApp) {
         while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_EVENT_QUIT:
-                    state.quitApp = true;
-                    break;
-
-                case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                    if (event.button.button == SDL_BUTTON_RIGHT) {
-                        LPPOINT pt;
-                        GetCursorPos(pt);
-                        showContextMenu(&state, pt->x, pt->y);
-                        //showContextMenu(&state, event.button.x, event.button.y);
-                    }
-                    if (event.button.button == SDL_BUTTON_LEFT) {
-                        state.dragging = true;
-                        state.dragX = event.button.x;
-                        state.dragY = event.button.y;
-                    }
-                    break;
-                
-                case SDL_EVENT_MOUSE_BUTTON_UP:
-                    if (event.button.button == SDL_BUTTON_LEFT) {
-                        state.dragging = false;
-                    }
-                    break;
-
-                // https://stackoverflow.com/questions/7773771/how-do-i-implement-dragging-a-window-using-its-client-area
-                case SDL_EVENT_MOUSE_MOTION:
-                    if (state.dragging) {
-                        int deltaX = event.motion.x - state.dragX;
-                        int deltaY = event.motion.y - state.dragY;
-
-                        //int windowX, windowY;
-                        //SDL_GetWindowPosition(state.window, &windowX, &windowY);
-
-                        SDL_SetWindowPosition(state.window, event.motion.x - deltaX, event.motion.y - deltaY); // windowX + deltaX, windowY + deltaY
-
-                        state.dragX = event.motion.x;
-                        state.dragY = event.motion.y;
-                    }
-                    break;
-
-                case SDL_EVENT_KEY_DOWN:
-                    switch (event.key.key) {
-                        case SDLK_Q:
-                        case SDLK_ESCAPE:
-                            state.quitApp = true;
-                            break;
-
-                        case SDLK_A:
-                            state.keepAspectRatio = !state.keepAspectRatio;
-                            break;
-
-                        case SDLK_B:
-                            state.useBlackBg = !state.useBlackBg;
-                            break;
-
-                        case SDLK_T:
-                            state.alwaysOnTop = !state.alwaysOnTop;
-                            updateAlwaysOnTop(&state);
-                            break;
-
-                        case SDLK_L:
-                            state.useAntialiasing = !state.useAntialiasing;
-                            updateUseAntialiasing(&state);
-                            break;
-
-                        case SDLK_R:
-                            resizeWindowToImage(&state);
-                            break;
-                    }
-                    break;
-            }
+            handleEvent(&state, &event);
         }
-
         drawFrame(&state);
     }
 
