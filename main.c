@@ -18,6 +18,7 @@ struct AppState {
     char *imagePath;
 
     bool keepAspectRatio;
+    bool useBlackBg;
 };
 
 int min(int a, int b) {
@@ -43,6 +44,7 @@ int main(int argc, char* argv[]) {
     state.renderer = NULL;
     state.texture = NULL;
     state.keepAspectRatio = true;
+    state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
 
     state.imagePath = malloc(100 * sizeof(char));
     if (state.imagePath == NULL) {
@@ -100,12 +102,17 @@ int main(int argc, char* argv[]) {
                         case SDLK_A:
                             state.keepAspectRatio = !state.keepAspectRatio;
                             break;
+
+                        case SDLK_B:
+                            state.useBlackBg = !state.useBlackBg;
+                            break;
                     }
                     break;
             }
         }
 
-        SDL_SetRenderDrawColor(state.renderer, 0, 0, 0, 0xff);
+        int _bgColor = state.useBlackBg ? 0 : 0xff;
+        SDL_SetRenderDrawColor(state.renderer, _bgColor, _bgColor, _bgColor, 0xff);
         SDL_RenderClear(state.renderer);
 
         if (state.keepAspectRatio) {
