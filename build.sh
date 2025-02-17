@@ -3,12 +3,13 @@ autorun=false
 yesconsole=false
 static=false
 
-while getopts "vd" opt; do
-  case ${opt} in
-    ar ) autorun=true ;;
-    yc ) yesconsole=true ;;
-    st ) static=true ;;
-    \? ) echo -e "\nUsage: $0 [-ar] [-yc] [-st]\n-ar | autorun    | autoruns the built executable\n-yc | yesconsole | removes the -mwindows flag from gcc, which is on by default\n-st | static     | adds the -static flag to gcc" ; exit 1 ;;
+while getopts "hays" OPTION; do
+  case $OPTION in
+    a) autorun=true ;;
+    y) yesconsole=true ;;
+    s) static=true ;;
+    h) echo -e "\nUsage: $0 [-a] [-y] [-s]\n-a | autorun    | autoruns the built executable\n-y | yesconsole | removes the -mwindows flag from gcc, which is on by default\n-s | static     | adds the -static flag to gcc" ; exit 1 ;;
+    \?) echo "Invalid option. See the help menu with '-h'" >&2; exit 1;;
   esac
 done
 
@@ -20,7 +21,7 @@ args=()
 ! $yesconsole && args+=("-mwindows")
 $static && args+=("-static")
 
-gcc -o "${appName}.exe" main.c -I ./SDL3/include -I ./SDL3_Image/include -L ./SDL3/lib -L ./SDL3_Image/lib -l SDL3 -l SDL3_Image "${args[@]}"
+gcc -o "${appName}.exe" "${args[@]}" main.c -I ./SDL3/include -I ./SDL3_Image/include -L ./SDL3/lib -L ./SDL3_Image/lib -l SDL3 -l SDL3_Image
 if $autorun; then
     "./${appName}.exe"
 fi
