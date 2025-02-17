@@ -1,14 +1,14 @@
 appName="plainIMG"
 autorun=false
-noconsole=true
+yesconsole=false
 static=false
 
 while getopts "vd" opt; do
   case ${opt} in
     ar ) autorun=true ;;
-    nc ) noconsole=true ;;
+    yc ) yesconsole=true ;;
     st ) static=true ;;
-    \? ) echo -e "\nUsage: $0 [-ar] [-nc] [-st]\n-ar | autorun   | autoruns the built executable\n-nc | noconsole | adds the -mwindows flag to gcc\n-st | static    | adds the -static flag to gcc" ; exit 1 ;;
+    \? ) echo -e "\nUsage: $0 [-ar] [-yc] [-st]\n-ar | autorun    | autoruns the built executable\n-yc | yesconsole | removes the -mwindows flag from gcc, which is on by default\n-st | static     | adds the -static flag to gcc" ; exit 1 ;;
   esac
 done
 
@@ -17,7 +17,7 @@ cp SDL3/bin/SDL3.dll .
 cp SDL3_Image/bin/SDL3_image.dll .
 
 args=()
-$noconsole && args+=("-mwindows")
+! $yesconsole && args+=("-mwindows")
 $static && args+=("-static")
 
 gcc -o "${appName}.exe" main.c -I ./SDL3/include -I ./SDL3_Image/include -L ./SDL3/lib -L ./SDL3_Image/lib -l SDL3 -l SDL3_Image "${args[@]}"
