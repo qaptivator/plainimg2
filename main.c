@@ -204,10 +204,12 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
                 int deltaX = event->motion.x - state->dragX;
                 int deltaY = event->motion.y - state->dragY;
 
-                //int windowX, windowY;
-                //SDL_GetWindowPosition(state->window, &windowX, &windowY);
+                int windowX, windowY;
+                SDL_GetWindowPosition(state->window, &windowX, &windowY);
 
-                SDL_SetWindowPosition(state->window, event->motion.x - deltaX, event->motion.y - deltaY); // windowX + deltaX, windowY + deltaY
+                // event->motion.x - deltaX, event->motion.y - deltaY
+                // windowX + deltaX, windowY + deltaY
+                SDL_SetWindowPosition(state->window, windowX + deltaX, windowY + deltaY);
 
                 state->dragX = event->motion.x;
                 state->dragY = event->motion.y;
