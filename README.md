@@ -30,7 +30,7 @@ you can also make the window be always an top, so its actually usable (inspired 
 at first, i made this in python, but pyinstaller executables were always flagged by antiviruses, so i decided to remake the project in C with SDL.
 this not only makes the project not false flagged by antiviruses, but also more lightweight!
 
-licensed under MIT.
+licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 
 # build
 

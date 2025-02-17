@@ -8,7 +8,7 @@
 #define W_HEIGHT 600
 #define WMIN_WIDTH 150
 #define WMIN_HEIGHT 150
-#define REPO_URL "https://github.com/qaptivator/plainimg"
+#define REPO_URL "https://github.com/qaptivator/plainimg2"
 #define IMG_PATH "terrain.png"
 
 // TODO: add the image filename to the window's title
