@@ -14,6 +14,9 @@
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
 
+#define WELCOME_WHITE_PATH "welcome_white.png"
+#define WELCOME_BLACK_PATH "welcome_black.png"
+
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
 
 // why did i have typedef here
@@ -91,6 +94,46 @@ HWND getHwndFromWindow(SDL_Window *window) {
     return hwnd;
 }
 
+// unfortunately this function is windows-only now womp womp
+void openImage(struct AppState *state, const char *path) {
+    if (path == NULL) {
+        SDL_Log("no path");
+        state->textureLoaded = false;
+        return;
+    }
+
+    HWND hwnd = getHwndFromWindow(state->window);
+
+    // close SDL_IOStream with SDL_CloseIO(stream);
+    SDL_IOStream *stream = SDL_IOFromFile(path, "r");
+    if (stream == NULL) {
+        // file doesnt exist
+        state->textureLoaded = false;
+        SDL_CloseIO(stream);
+        return;
+    }
+
+    if (IMG_isWEBP(stream)) {
+        SDL_Log("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image.");
+        MessageBox(hwnd, TEXT("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image."), TEXT("plainIMG Error"), MB_OK | MB_ICONERROR);
+        state->textureLoaded = false;
+        SDL_CloseIO(stream);
+        return;
+    }
+
+    // the last option automatically closes the stream
+    SDL_Texture *newTexture = IMG_LoadTexture_IO(state->renderer, stream, true);
+    if (newTexture == NULL) {
+        // SDL3_image CANNOT parse webp files. or else you get this error:
+        // Failed loading libwebpdemux-2.dll: The specified module could not be found.
+        SDL_Log("IMG_LoadTexture error at setImagePath: %s", SDL_GetError());
+        return;
+    }
+
+    state->texture = newTexture;
+    state->textureLoaded = true;
+}
+
 void showContextMenu(struct AppState *state, int x, int y) {
     HWND hwnd = getHwndFromWindow(state->window);
 
@@ -114,11 +157,11 @@ void showContextMenu(struct AppState *state, int x, int y) {
     AppendMenu(hMenu, MF_STRING, 9, "Quit\tQ");
 
     int itemId = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, x, y, 0, hwnd, NULL);
-    SDL_Log("itemId: %d", itemId);
     switch (itemId) {
         case 1:
             break;
         case 2:
+            openImage(state, NULL);
             break;
         case 3:
             state->alwaysOnTop = !state->alwaysOnTop;
@@ -165,10 +208,11 @@ void drawFrame(struct AppState *state) {
     SDL_SetRenderDrawColor(state->renderer, _bgColor, _bgColor, _bgColor, 0xff);
     SDL_RenderClear(state->renderer);
 
+    int _windowWidth, _windowHeight;
+    SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
+
     if (state->textureLoaded) {
         if (state->keepAspectRatio) {
-            int _windowWidth, _windowHeight;
-            SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
             int _textureWidth = state->texture->w;
             int _textureHeight = state->texture->h;
 
@@ -184,13 +228,18 @@ void drawFrame(struct AppState *state) {
             SDL_RenderTexture(state->renderer, state->texture, NULL, NULL);
         }
     } else {
-        SDL_FRect centerRect;
         if (state->useBlackBg) {
-
+            state->textureRect->w = state->welcomeBlack->w;
+            state->textureRect->h = state->welcomeBlack->h;
+            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+            SDL_RenderTexture(state->renderer, state->welcomeBlack, NULL, state->textureRect);
         } else {
-            centerRect.w = state->welcomeWhite->w;
-            centerRect.h = state->welcomeWhite->h;
-            SDL_RenderTexture(state->renderer, state->welcomeWhite, NULL, );
+            state->textureRect->w = state->welcomeWhite->w;
+            state->textureRect->h = state->welcomeWhite->h;
+            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+            SDL_RenderTexture(state->renderer, state->welcomeWhite, NULL, state->textureRect);
         }
     }
 
@@ -266,6 +315,10 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
                 case SDLK_R:
                     resizeWindowToImage(state);
                     break;
+
+                case SDLK_C:
+                    openImage(state, NULL);
+                    break;
             }
             break;
     }
@@ -282,39 +335,6 @@ bool eventFilter(void *userdata, SDL_Event *event) {
         drawFrame(state);
     }
     return 1;
-}
-
-void openImage(struct AppState *state, const char *path) {
-    HWND hwnd = getHwndFromWindow(state->window);
-
-    // close SDL_IOStream with SDL_CloseIO(stream);
-    SDL_IOStream *stream = SDL_IOFromFile(path, "r");
-    if (stream == NULL) {
-        // file doesnt exist
-        state->textureLoaded = false;
-        SDL_CloseIO(stream);
-        return;
-    }
-
-    if (IMG_isWEBP(stream)) {
-        SDL_Log("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image.");
-        MessageBox(hwnd, TEXT("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image."), TEXT("plainIMG Error"), MB_OK | MB_ICONERROR);
-        state->textureLoaded = false;
-        SDL_CloseIO(stream);
-        return;
-    }
-
-    // the last option automatically closes the stream
-    SDL_Texture *newTexture = IMG_LoadTexture_IO(state->renderer, stream, true);
-    if (newTexture == NULL) {
-        // SDL3_image CANNOT parse webp files. or else you get this error:
-        // Failed loading libwebpdemux-2.dll: The specified module could not be found.
-        SDL_Log("IMG_LoadTexture error at setImagePath: %s", SDL_GetError());
-        return;
-    }
-
-    state->texture = newTexture;
-    state->textureLoaded = true;
 }
 
 int main(int argc, char* argv[]) {
@@ -361,12 +381,12 @@ int main(int argc, char* argv[]) {
 
     // textures
     // i can also just color a single white image, but im lazy, so i will have both for both light and dark mode
-    state.welcomeWhite = IMG_LoadTexture(state.renderer, "welcomeWhite.png");
+    state.welcomeWhite = IMG_LoadTexture(state.renderer, WELCOME_WHITE_PATH);
     if (state.welcomeWhite == NULL) {
         SDL_Log("IMG_LoadTexture welcomeWhite error: %s", SDL_GetError());
         return -3;
     }
-    state.welcomeBlack = IMG_LoadTexture(state.renderer, "welcomeBlack.png");
+    state.welcomeBlack = IMG_LoadTexture(state.renderer, WELCOME_BLACK_PATH);
     if (state.welcomeBlack == NULL) {
         SDL_Log("IMG_LoadTexture welcomeBlack error: %s", SDL_GetError());
         return -4;
