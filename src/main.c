@@ -33,6 +33,9 @@ struct AppState {
 
     bool dragging;
     int dragX, dragY;
+
+    SDL_Texture *welcomeWhite;
+    SDL_Texture *welcomeBlack;
 };
 //typedef struct _appstate AppState;
 
@@ -152,6 +155,8 @@ void showContextMenu(struct AppState *state, int x, int y) {
 #else
 // context menu unsuported for other platforms, for now
 void showContextMenu(struct AppState *state, int x, int y) {}
+// is it fine that i use HWND even if its not defined?
+// i dont even know what HWND is...
 HWND getHwndFromWindow(SDL_Window *window) {}
 #endif
 
@@ -178,7 +183,16 @@ void drawFrame(struct AppState *state) {
         } else {
             SDL_RenderTexture(state->renderer, state->texture, NULL, NULL);
         }
-    } else {}
+    } else {
+        SDL_FRect centerRect;
+        if (state->useBlackBg) {
+
+        } else {
+            centerRect.w = state->welcomeWhite->w;
+            centerRect.h = state->welcomeWhite->h;
+            SDL_RenderTexture(state->renderer, state->welcomeWhite, NULL, );
+        }
+    }
 
     SDL_RenderPresent(state->renderer);
     SDL_Delay(1);
@@ -341,11 +355,24 @@ int main(int argc, char* argv[]) {
     state.renderer = SDL_CreateRenderer(state.window, NULL);
     if (state.renderer == NULL) {
         SDL_Log("SDL_CreateRenderer error: %s", SDL_GetError());
+        return -2;
+    }
+    SDL_SetEventFilter(&eventFilter, &state);
+
+    // textures
+    // i can also just color a single white image, but im lazy, so i will have both for both light and dark mode
+    state.welcomeWhite = IMG_LoadTexture(state.renderer, "welcomeWhite.png");
+    if (state.welcomeWhite == NULL) {
+        SDL_Log("IMG_LoadTexture welcomeWhite error: %s", SDL_GetError());
         return -3;
+    }
+    state.welcomeBlack = IMG_LoadTexture(state.renderer, "welcomeBlack.png");
+    if (state.welcomeBlack == NULL) {
+        SDL_Log("IMG_LoadTexture welcomeBlack error: %s", SDL_GetError());
+        return -4;
     }
 
     // other
-    SDL_SetEventFilter(&eventFilter, &state);
     updateAlwaysOnTop(&state);
     updateUseAntialiasing(&state);
     // SDL_Log("SDL3 initialized");
@@ -366,13 +393,12 @@ int main(int argc, char* argv[]) {
 
     // ----- QUIT -----
 
-    //SDL_Log("SDL3 shutdown");
+    // SDL_Log("SDL3 shutdown");
     SDL_DestroyTexture(state.texture);
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
-    //IMG_Quit();
+    // IMG_Quit();
     SDL_Quit();
-    //free(state.imagePath);
 
     return 0;
 }

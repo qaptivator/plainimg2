@@ -55,4 +55,5 @@ you would also need to use `git submodule update --init --recursive` in SDL imag
 - [ ] save menu configurations to some text file, so that it will save between launches
 - [ ] add a reminder when there is a new version of this app
 - [ ] finish up lite mode
-- [ ] add icon to the executable with windres
+- [x] add icon to the executable with windres
+- [ ] build this exe statically (basically you need to have .a's instead of .dll's) (SDL3_image doesnt want to build statically wth)
