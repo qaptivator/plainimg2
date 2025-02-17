@@ -9,7 +9,6 @@
 #define WMIN_WIDTH 150
 #define WMIN_HEIGHT 150
 #define REPO_URL "https://github.com/qaptivator/plainimg2"
-#define IMG_PATH "terrain.png"
 
 // TODO: add the image filename to the window's title
 #define WINDOW_TITLE "plainIMG"
@@ -277,7 +276,7 @@ int main(int argc, char* argv[]) {
     state.keepAspectRatio = true;
     state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
     state.alwaysOnTop = true;
-    state.useAntialiasing = false;
+    state.useAntialiasing = true;
     state.quitApp = false;
     state.dragging = false;
     state.dragX = 0;
@@ -291,12 +290,9 @@ int main(int argc, char* argv[]) {
         SDL_Log("Memory allocation failed for imagePath during malloc\n");
         return 1;
     }
-
     if (argc > 1) {
-        
+        setImagePath(&state, argv[1]);
     }
-    char mystr[100] = IMG_PATH;
-    setImagePath(&state, mystr);
 
     int result = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     if (result < 0) {
