@@ -179,16 +179,20 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            POINT pt;
+            GetCursorPos(&pt);
             if (event->button.button == SDL_BUTTON_RIGHT) {
-                POINT pt;
-                GetCursorPos(&pt);
                 showContextMenu(state, pt.x, pt.y);
                 //showContextMenu(&state, event->button.x, event->button.y);
             }
             if (event->button.button == SDL_BUTTON_LEFT) {
                 state->dragging = true;
-                state->dragX = event->button.x;
-                state->dragY = event->button.y;
+                int windowX, windowY;
+                SDL_GetWindowPosition(state->window, &windowX, &windowY);
+                //state->dragX = event->button.x - windowX;
+                //state->dragY = event->button.y - windowY;
+                state->dragX = pt.x - windowX;
+                state->dragY = pt.y - windowY;
             }
             break;
         
@@ -201,18 +205,24 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
         // https://stackoverflow.com/questions/7773771/how-do-i-implement-dragging-a-window-using-its-client-area
         case SDL_EVENT_MOUSE_MOTION:
             if (state->dragging) {
-                int deltaX = event->motion.x - state->dragX;
-                int deltaY = event->motion.y - state->dragY;
+                //int deltaX = event->motion.x - state->dragX;
+                //int deltaY = event->motion.y - state->dragY;
 
-                int windowX, windowY;
-                SDL_GetWindowPosition(state->window, &windowX, &windowY);
+                POINT pt;
+                GetCursorPos(&pt);
+                int deltaX = pt.x - state->dragX;
+                int deltaY = pt.y - state->dragY;
+                SDL_SetWindowPosition(state->window, deltaX, deltaY);
+
+                //int windowX, windowY;
+                //SDL_GetWindowPosition(state->window, &windowX, &windowY);
 
                 // event->motion.x - deltaX, event->motion.y - deltaY
                 // windowX + deltaX, windowY + deltaY
-                SDL_SetWindowPosition(state->window, windowX + deltaX, windowY + deltaY);
+                //SDL_SetWindowPosition(state->window, windowX + deltaX, windowY + deltaY);
 
-                state->dragX = event->motion.x;
-                state->dragY = event->motion.y;
+                //state->dragX = event->motion.x;
+                //state->dragY = event->motion.y;
             }
             break;
 
