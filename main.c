@@ -22,6 +22,7 @@ struct AppState {
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *texture;
+    SDL_FRect *textureRect;
     char *imagePath;
     bool quitApp;
 
@@ -55,6 +56,12 @@ void updateAlwaysOnTop(struct AppState *state) {
 
 void updateUseAntialiasing(struct AppState *state) {
     SDL_SetTextureScaleMode(state->texture, state->useAntialiasing ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
+}
+
+void resizeWindowToImage(struct AppState *state) {
+    if (state->keepAspectRatio && state->textureRect->w > 0 && state->textureRect->h > 0) {
+        SDL_SetWindowSize(state->window, state->textureRect->w, state->textureRect->w);
+    }
 }
 
 #ifdef _WIN32
@@ -106,6 +113,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
             state->keepAspectRatio = !state->keepAspectRatio;
             break;
         case 5:
+            resizeWindowToImage(state);
             break;
         case 6:
             state->useBlackBg = !state->useBlackBg;
@@ -146,6 +154,9 @@ int main(int argc, char* argv[]) {
     state.useAntialiasing = false;
     state.quitApp = false;
 
+    SDL_FRect _textureRect;
+    state.textureRect = &_textureRect;
+
     state.imagePath = malloc(100 * sizeof(char));
     if (state.imagePath == NULL) {
         SDL_Log("Memory allocation failed\n");
@@ -181,16 +192,8 @@ int main(int argc, char* argv[]) {
         // https://stackoverflow.com/questions/74526664/sdl2-problems-with-webp-animated-images-works-with-gifs-but-not-with-webp
         // source code for IMG_LoadTexture: https://github.com/libsdl-org/SDL_image/blob/9ce9650a2bf8cf1c95d77ce8c5ce0a54f4ccbed4/src/IMG.c#L203
         SDL_Log("IMG_LoadTexture error: %s", SDL_GetError());
-        //SDL_Log("IMG_LoadTexture error: %s", IMG_GetError());
-        //SDL_Log("IMG_LoadTexture error:");
         return -4;
     }
-    /*SDL_Surface* img = IMG_Load(IMG_PATH);
-    if (!img) {
-        SDL_Log("IMG_Load: %s", SDL_GetError());
-    }
-    state.texture = SDL_CreateTextureFromSurface(state.renderer, img);
-    SDL_DestroySurface(img);*/
 
     updateAlwaysOnTop(&state);
     updateUseAntialiasing(&state);
@@ -240,6 +243,10 @@ int main(int argc, char* argv[]) {
                             state.useAntialiasing = !state.useAntialiasing;
                             updateUseAntialiasing(&state);
                             break;
+
+                        case SDLK_R:
+                            resizeWindowToImage(&state);
+                            break;
                     }
                     break;
             }
@@ -257,13 +264,12 @@ int main(int argc, char* argv[]) {
 
             float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
 
-            SDL_FRect destRect;
-            destRect.w = (int)(_textureWidth * _scale);
-            destRect.h = (int)(_textureHeight * _scale);
-            destRect.x = (_windowWidth - destRect.w) / 2;
-            destRect.y = (_windowHeight - destRect.h) / 2;
+            state.textureRect->w = (int)(_textureWidth * _scale);
+            state.textureRect->h = (int)(_textureHeight * _scale);
+            state.textureRect->x = (_windowWidth - state.textureRect->w) / 2;
+            state.textureRect->y = (_windowHeight - state.textureRect->h) / 2;
 
-            SDL_RenderTexture(state.renderer, state.texture, NULL, &destRect);
+            SDL_RenderTexture(state.renderer, state.texture, NULL, state.textureRect);
         } else {
             SDL_RenderTexture(state.renderer, state.texture, NULL, NULL);
         }
