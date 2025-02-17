@@ -23,6 +23,7 @@ struct AppState {
     SDL_Texture *texture;
     SDL_FRect *textureRect;
     char *imagePath;
+    bool textureLoaded;
     bool quitApp;
 
     bool keepAspectRatio;
@@ -258,13 +259,37 @@ bool eventFilter(void *userdata, SDL_Event *event) {
 }
 
 void setImagePath(struct AppState *state, const char *str) {
-    char *newMemory = realloc(state->imagePath, (strlen(str) + 1) * sizeof(char));
-    if (state->imagePath == NULL) {
+    SDL_IOStream *stream = SDL_IOFromFile(str, "r");
+    if (stream == NULL) {
+        // file doesnt exist
+        state->textureLoaded = false;
+        return;
+    } else {
+        SDL_CloseIO(stream);
+    }
+
+    char *newPath = realloc(state->imagePath, (strlen(str) + 1) * sizeof(char));
+    if (newPath == NULL) {
         SDL_Log("Memory allocation failed for imagePath during realloc\n");
         return;
     }
-    state->imagePath = newMemory;
+
+    SDL_Texture *newTexture = IMG_LoadTexture(state->renderer, newPath);
+    if (newTexture == NULL) {
+        // the issue is that it was a webp file, even though it was png extension
+        // im getting this weird error for low resolution image (terrain.png):
+        // Failed loading libwebpdemux-2.dll: The specified module could not be found.
+        // https://stackoverflow.com/questions/67082153/pygame-installed-on-windows-getting-pygame-error-failed-loading-libwebp-7-dll
+        // https://stackoverflow.com/questions/74526664/sdl2-problems-with-webp-animated-images-works-with-gifs-but-not-with-webp
+        // source code for IMG_LoadTexture: https://github.com/libsdl-org/SDL_image/blob/9ce9650a2bf8cf1c95d77ce8c5ce0a54f4ccbed4/src/IMG.c#L203
+        SDL_Log("IMG_LoadTexture error at setImagePath: %s", SDL_GetError());
+        return -4;
+    }
+
+    state->imagePath = newPath;
     strcpy(state->imagePath, str);
+    state->texture = newTexture;
+    state->textureLoaded = true;
 }
 
 int main(int argc, char* argv[]) {
@@ -273,6 +298,7 @@ int main(int argc, char* argv[]) {
     state.window = NULL;
     state.renderer = NULL;
     state.texture = NULL;
+    state.textureLoaded = false;
     state.keepAspectRatio = true;
     state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
     state.alwaysOnTop = true;
@@ -311,18 +337,6 @@ int main(int argc, char* argv[]) {
     if (state.renderer == NULL) {
         SDL_Log("SDL_CreateRenderer error: %s", SDL_GetError());
         return -3;
-    }
-
-    state.texture = IMG_LoadTexture(state.renderer, state.imagePath);
-    if (state.texture == NULL) {
-        // the issue is that it was a webp file, even though it was png extension
-        // im getting this weird error for low resolution image (terrain.png):
-        // Failed loading libwebpdemux-2.dll: The specified module could not be found.
-        // https://stackoverflow.com/questions/67082153/pygame-installed-on-windows-getting-pygame-error-failed-loading-libwebp-7-dll
-        // https://stackoverflow.com/questions/74526664/sdl2-problems-with-webp-animated-images-works-with-gifs-but-not-with-webp
-        // source code for IMG_LoadTexture: https://github.com/libsdl-org/SDL_image/blob/9ce9650a2bf8cf1c95d77ce8c5ce0a54f4ccbed4/src/IMG.c#L203
-        SDL_Log("IMG_LoadTexture error: %s", SDL_GetError());
-        return -4;
     }
 
     SDL_SetEventFilter(&eventFilter, &state);

@@ -40,6 +40,16 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 - if youre not building with standalone version, you NEED to have `SDL3.dll`, `SDL3_image.dll` and `icon.ico` located in the same directory as the executable
 - build the icon with `windres plainIMG.rc -o plainIMG_rc.o`
 
+libraries used: [SDL 3](https://github.com/libsdl-org/SDL), [SDL3_image 3](https://github.com/libsdl-org/SDL_image/),
+
+if you want to update SDL or SLD_Image, you would have to build static binaries (`*.a`) yourself.  
+just clone the repositores, make a `build` folder, inside it run `cmake .. -DSDL_STATIC=ON` and `cmake --build .`.  
+then, just copy over generated `.a` files to `lib/` folder of each library.
+
+for SDL3_image, there is a special case. copy over the entire SDL folder, where you just built it inside `build/`,  
+then run SDL3_image build with `cmake .. -DSDL_STATIC=ON -DSDL3_DIR=../SDL/build`.
+you would also need to use `git submodule update --init --recursive` in SDL image.
+
 # todo list
 
 - [ ] save menu configurations to some text file, so that it will save between launches
