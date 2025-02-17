@@ -6,8 +6,9 @@
 
 #define W_WIDTH 800
 #define W_HEIGHT 600
-#define WMIN_WIDTH 200
+#define WMIN_WIDTH 150
 #define WMIN_HEIGHT 150
+#define REPO_URL "https://github.com/qaptivator/plainimg"
 #define IMG_PATH "terrain.png"
 
 // TODO: add the image filename to the window's title
@@ -86,7 +87,8 @@ void showContextMenu(struct AppState *state, int x, int y) {
     AppendMenu(hMenu, CHECK_STATE(state->useBlackBg), 6, "Use black background\tB");
     AppendMenu(hMenu, CHECK_STATE(state->useAntialiasing), 7, "Use antialiasing\tL");
     AppendMenu(hMenu, MF_SEPARATOR, 10, "");
-    AppendMenu(hMenu, MF_STRING, 8, "Quit\tQ");
+    AppendMenu(hMenu, MF_STRING, 8, "About");
+    AppendMenu(hMenu, MF_STRING, 9, "Quit\tQ");
 
     int itemId = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, x, y, 0, hwnd, NULL);
     SDL_Log("itemId: %d", itemId);
@@ -112,6 +114,14 @@ void showContextMenu(struct AppState *state, int x, int y) {
             updateUseAntialiasing(state);
             break;
         case 8:
+            int _buttonId = MessageBox(hwnd, TEXT( "The driver is sleeping!!" ), TEXT( "Message" ), MB_OKCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON2);
+            SDL_Log("_buttonId: %d", _buttonId);
+            if (_buttonId == 1) {
+                //system("open https://github.com/qaptivator/plainimg");
+                ShellExecute(NULL, "open", REPO_URL, NULL, NULL, SW_SHOWNORMAL);
+            }
+            break;
+        case 9:
             break;
     }
 
@@ -151,6 +161,7 @@ int main(int argc, char* argv[]) {
         SDL_Log("SDL_CreateWindow error: %s", SDL_GetError());
         return -1;
     }
+    SDL_SetWindowMinimumSize(state.window, WMIN_WIDTH, WMIN_HEIGHT);
 
     state.renderer = SDL_CreateRenderer(state.window, NULL);
     if (state.renderer == NULL) {
