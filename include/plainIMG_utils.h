@@ -10,6 +10,7 @@ static inline int setWindowAlwaysOnTop(SDL_Window* window, bool enable);
 
     #include <windows.h>
     static inline int setWindowAlwaysOnTop(SDL_Window* window, bool enable) {
+        // https://github.com/libsdl-org/sdlwiki/issues/443
         //HWND hwnd = SDL_GetWindowWMInfo(window)->info.win.window;
         //HWND hwnd = SDL_GetWindowProperties(window)
         //if (enable) {

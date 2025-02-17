@@ -78,6 +78,7 @@ int main(int argc, char* argv[]) {
         return -4;
     }
 
+    // TODO: add a variable inside of state for this
     SDL_SetWindowAlwaysOnTop(state.window, true);
     SDL_Log("SDL3 initialized");
 
