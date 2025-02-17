@@ -10,6 +10,10 @@
 #define WMIN_HEIGHT 150
 #define IMG_PATH "image.png"
 
+// TODO: add the image filename to the window's title
+#define WINDOW_TITLE "plainIMG"
+#define WINDOW_TILTE_TOP "plainIMG [TOP]"
+
 // why did i have typedef here
 struct AppState {
     SDL_Window *window;
@@ -19,6 +23,7 @@ struct AppState {
 
     bool keepAspectRatio;
     bool useBlackBg;
+    bool alwaysOnTop;
 };
 
 int min(int a, int b) {
@@ -45,6 +50,7 @@ int main(int argc, char* argv[]) {
     state.texture = NULL;
     state.keepAspectRatio = true;
     state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
+    state.alwaysOnTop = true;
 
     state.imagePath = malloc(100 * sizeof(char));
     if (state.imagePath == NULL) {
@@ -78,8 +84,8 @@ int main(int argc, char* argv[]) {
         return -4;
     }
 
-    // TODO: add a variable inside of state for this
-    SDL_SetWindowAlwaysOnTop(state.window, true);
+    SDL_SetWindowAlwaysOnTop(state.window, state.alwaysOnTop);
+    SDL_SetWindowTitle(state.window, state.alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
     SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
@@ -107,6 +113,12 @@ int main(int argc, char* argv[]) {
 
                         case SDLK_B:
                             state.useBlackBg = !state.useBlackBg;
+                            break;
+
+                        case SDLK_T:
+                            state.alwaysOnTop = !state.alwaysOnTop;
+                            SDL_SetWindowAlwaysOnTop(state.window, state.alwaysOnTop);
+                            SDL_SetWindowTitle(state.window, state.alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
                             break;
                     }
                     break;

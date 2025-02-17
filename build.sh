@@ -11,4 +11,4 @@ cp SDL3_Image/bin/SDL3_image.dll .
 # gcc -o a.exe test11.c -I SDL3/include -I SDL3_Image/include -L SDL3/lib -L SDL3_Image/lib -l SDL3 -l SDL3_Image -mwindows
 
 # gcc -o plainIMG.exe main.c -I ./include -I SDL3/include -I SDL3_Image/include -L SDL3/lib -L SDL3_Image/lib -l SDL3 -l SDL3_Image -mwindows
-gcc -o plainIMG.exe main.c -I SDL3/include -I SDL3_Image/include -L SDL3/lib -L SDL3_Image/lib -l SDL3 -l SDL3_Image -mwindows
+gcc -o plainIMG.exe main.c -I ./SDL3/include -I ./SDL3_Image/include -L ./SDL3/lib -L ./SDL3_Image/lib -l SDL3 -l SDL3_Image -mwindows
