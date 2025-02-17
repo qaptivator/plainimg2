@@ -38,6 +38,7 @@ licensed under MIT.
 - you need vs c/c++ redistributable and gcc installed
 - run `./build.sh`, and it will build everything for you with gcc. run with `./plainIMG.exe` (or `./build.sh && ./plainIMG.exe` for short)
 - if youre not building with standalone version, you NEED to have `SDL3.dll`, `SDL3_image.dll` and `icon.ico` located in the same directory as the executable
+- build the icon with `windres plainIMG.rc -o plainIMG_rc.o`
 
 # todo list
 

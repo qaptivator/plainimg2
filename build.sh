@@ -21,10 +21,17 @@ args=()
 ! $yesconsole && args+=("-mwindows")
 $static && args+=("-static")
 
-gcc -o "${appName}.exe" "${args[@]}" main.c -I ./SDL3/include -I ./SDL3_Image/include -L ./SDL3/lib -L ./SDL3_Image/lib -l SDL3 -l SDL3_Image
+if [ -f "./plainIMG_rc.o" ]; then
+  gcc -o "${appName}.exe" plainIMG_rc.o "${args[@]}" main.c -I ./SDL3/include -I ./SDL3_Image/include -L ./SDL3/lib -L ./SDL3_Image/lib -l SDL3 -l SDL3_Image
+else
+  gcc -o "${appName}.exe" "${args[@]}" main.c -I ./SDL3/include -I ./SDL3_Image/include -L ./SDL3/lib -L ./SDL3_Image/lib -l SDL3 -l SDL3_Image
+fi
+
 if $autorun; then
     "./${appName}.exe"
 fi
+
+# build the icon with "windres plainIMG.rc -o plainIMG_rc.o"
 
 # test1-7.c
 # gcc -o a.exe test4.c -I./SDL3/include -L./SDL3/lib -lSDL3
