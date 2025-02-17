@@ -179,6 +179,7 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            // GetCursorPos IS RELATIVE TO SCREEN, event->button.x OR event->motion.x IS RELATIVE TO WINDOW
             POINT pt;
             GetCursorPos(&pt);
             if (event->button.button == SDL_BUTTON_RIGHT) {
@@ -189,8 +190,6 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
                 state->dragging = true;
                 int windowX, windowY;
                 SDL_GetWindowPosition(state->window, &windowX, &windowY);
-                //state->dragX = event->button.x - windowX;
-                //state->dragY = event->button.y - windowY;
                 state->dragX = pt.x - windowX;
                 state->dragY = pt.y - windowY;
             }
@@ -205,24 +204,11 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
         // https://stackoverflow.com/questions/7773771/how-do-i-implement-dragging-a-window-using-its-client-area
         case SDL_EVENT_MOUSE_MOTION:
             if (state->dragging) {
-                //int deltaX = event->motion.x - state->dragX;
-                //int deltaY = event->motion.y - state->dragY;
-
                 POINT pt;
                 GetCursorPos(&pt);
                 int deltaX = pt.x - state->dragX;
                 int deltaY = pt.y - state->dragY;
                 SDL_SetWindowPosition(state->window, deltaX, deltaY);
-
-                //int windowX, windowY;
-                //SDL_GetWindowPosition(state->window, &windowX, &windowY);
-
-                // event->motion.x - deltaX, event->motion.y - deltaY
-                // windowX + deltaX, windowY + deltaY
-                //SDL_SetWindowPosition(state->window, windowX + deltaX, windowY + deltaY);
-
-                //state->dragX = event->motion.x;
-                //state->dragY = event->motion.y;
             }
             break;
 
