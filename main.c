@@ -180,9 +180,9 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
             if (event->button.button == SDL_BUTTON_RIGHT) {
-                LPPOINT pt;
-                GetCursorPos(pt);
-                showContextMenu(&state, pt->x, pt->y);
+                POINT pt;
+                GetCursorPos(&pt);
+                showContextMenu(state, pt.x, pt.y);
                 //showContextMenu(&state, event->button.x, event->button.y);
             }
             if (event->button.button == SDL_BUTTON_LEFT) {
@@ -231,16 +231,16 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
 
                 case SDLK_T:
                     state->alwaysOnTop = !state->alwaysOnTop;
-                    updateAlwaysOnTop(&state);
+                    updateAlwaysOnTop(state);
                     break;
 
                 case SDLK_L:
                     state->useAntialiasing = !state->useAntialiasing;
-                    updateUseAntialiasing(&state);
+                    updateUseAntialiasing(state);
                     break;
 
                 case SDLK_R:
-                    resizeWindowToImage(&state);
+                    resizeWindowToImage(state);
                     break;
             }
             break;
