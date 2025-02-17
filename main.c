@@ -146,18 +146,41 @@ void showContextMenu(struct AppState *state, int x, int y) {}
 #endif
 
 void drawFrame(struct AppState *state) {
+    int _bgColor = state->useBlackBg ? 0 : 0xff;
+    SDL_SetRenderDrawColor(state->renderer, _bgColor, _bgColor, _bgColor, 0xff);
+    SDL_RenderClear(state->renderer);
 
+    if (state->keepAspectRatio) {
+        int _windowWidth, _windowHeight;
+        SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
+        int _textureWidth = state->texture->w;
+        int _textureHeight = state->texture->h;
+
+        float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
+
+        state->textureRect->w = (int)(_textureWidth * _scale);
+        state->textureRect->h = (int)(_textureHeight * _scale);
+        state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+        state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+
+        SDL_RenderTexture(state->renderer, state->texture, NULL, state->textureRect);
+    } else {
+        SDL_RenderTexture(state->renderer, state->texture, NULL, NULL);
+    }
+
+    SDL_RenderPresent(state->renderer);
+    SDL_Delay(1);
 }
 
 // https://stackoverflow.com/questions/7106586/keep-window-active-while-being-dragged-sdl-on-win32
 // https://wiki.libsdl.org/SDL3/SDL_EventFilter
 // https://wiki.libsdl.org/SDL3/SDL_SetEventFilter
-bool eventFilter(void *userdata, const SDL_Event *event)
+bool eventFilter(void *userdata, SDL_Event *event)
 {
     if (event->type == SDL_EVENT_WINDOW_RESIZED) {
         struct AppState *state = (struct AppState*)userdata;
         // Note: NULL rectangle is the entire window
-        SDL_RenderSetViewport(state->renderer, NULL);
+        SDL_SetRenderViewport(state->renderer, NULL);
         drawFrame(state);
     }
     return 1;
@@ -219,13 +242,12 @@ int main(int argc, char* argv[]) {
         return -4;
     }
 
-    SDL_SetEventFilter(eventFilter, &state);
+    SDL_SetEventFilter(&eventFilter, &state);
     updateAlwaysOnTop(&state);
     updateUseAntialiasing(&state);
     //SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
-    // bug: the image only resizes when i stop dragging (unhold the mouse button)
 
     SDL_Event event;
     while (!state.quitApp) {
@@ -304,30 +326,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        int _bgColor = state.useBlackBg ? 0 : 0xff;
-        SDL_SetRenderDrawColor(state.renderer, _bgColor, _bgColor, _bgColor, 0xff);
-        SDL_RenderClear(state.renderer);
-
-        if (state.keepAspectRatio) {
-            int _windowWidth, _windowHeight;
-            SDL_GetWindowSize(state.window, &_windowWidth, &_windowHeight);
-            int _textureWidth = state.texture->w;
-            int _textureHeight = state.texture->h;
-
-            float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
-
-            state.textureRect->w = (int)(_textureWidth * _scale);
-            state.textureRect->h = (int)(_textureHeight * _scale);
-            state.textureRect->x = (_windowWidth - state.textureRect->w) / 2;
-            state.textureRect->y = (_windowHeight - state.textureRect->h) / 2;
-
-            SDL_RenderTexture(state.renderer, state.texture, NULL, state.textureRect);
-        } else {
-            SDL_RenderTexture(state.renderer, state.texture, NULL, NULL);
-        }
-
-        SDL_RenderPresent(state.renderer);
-        SDL_Delay(1);
+        drawFrame(&state);
     }
 
     // ----- QUIT -----
