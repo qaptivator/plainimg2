@@ -8,7 +8,7 @@
 #define W_HEIGHT 600
 #define WMIN_WIDTH 200
 #define WMIN_HEIGHT 150
-#define IMG_PATH "image.png"
+#define IMG_PATH "terrain.png"
 
 // TODO: add the image filename to the window's title
 #define WINDOW_TITLE "plainIMG"
@@ -69,14 +69,17 @@ void showContextMenu(struct AppState *state, int x, int y) {
         return;
     }
 
-    AppendMenu(hMenu, MF_STRING, 1, "Open Image... (O)");
-    AppendMenu(hMenu, MF_STRING, 2, "Close Image (C)");
-    AppendMenu(hMenu, MF_STRING, 3, "Window always on top (T)");
-    AppendMenu(hMenu, MF_STRING, 4, "Keep aspect ratio (A)");
-    AppendMenu(hMenu, MF_STRING, 5, "Resize window to image (R)");
-    AppendMenu(hMenu, MF_STRING, 6, "Use black background (B)");
-    AppendMenu(hMenu, MF_STRING, 7, "Use antialiasing (L)");
-    AppendMenu(hMenu, MF_STRING, 8, "Quit (Q)");
+    // it takes the first letter of the string and makes it the shortcut for the button
+    // ugh why isnt there just an argument for this?
+    AppendMenu(hMenu, MF_STRING, 1, "Open Image...\tO");
+    AppendMenu(hMenu, MF_STRING, 2, "Close Image\tC");
+    AppendMenu(hMenu, MF_STRING, 3, "Window always on top\tT");
+    AppendMenu(hMenu, MF_STRING, 4, "Keep aspect ratio\tA");
+    AppendMenu(hMenu, MF_STRING, 5, "Resize window to image\tR");
+    AppendMenu(hMenu, MF_STRING, 6, "Use black background\tB");
+    AppendMenu(hMenu, MF_STRING, 7, "Use antialiasing\tL");
+    AppendMenu(hMenu, MF_SEPARATOR, 10, "");
+    AppendMenu(hMenu, MF_STRING, 8, "Quit\tQ");
 
     int itemId = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, x, y, 0, hwnd, NULL);
     SDL_Log("itemId: %d", itemId);
@@ -144,12 +147,24 @@ int main(int argc, char* argv[]) {
         return -3;
     }
 
-    state.texture = IMG_LoadTexture(state.renderer, state.imagePath);
+    /*state.texture = IMG_LoadTexture(state.renderer, state.imagePath);
     if (state.texture == NULL) {
+        // im getting this weird error for low resolution image (terrain.png):
+        // Failed loading libwebpdemux-2.dll: The specified module could not be found.
+        // https://stackoverflow.com/questions/67082153/pygame-installed-on-windows-getting-pygame-error-failed-loading-libwebp-7-dll
+        // https://stackoverflow.com/questions/74526664/sdl2-problems-with-webp-animated-images-works-with-gifs-but-not-with-webp
+        // source code for IMG_LoadTexture: https://github.com/libsdl-org/SDL_image/blob/9ce9650a2bf8cf1c95d77ce8c5ce0a54f4ccbed4/src/IMG.c#L203
+        SDL_Log("IMG_LoadTexture error: %s", SDL_GetError());
         //SDL_Log("IMG_LoadTexture error: %s", IMG_GetError());
-        SDL_Log("IMG_LoadTexture error:");
+        //SDL_Log("IMG_LoadTexture error:");
         return -4;
+    }*/
+    /*SDL_Surface* img = IMG_Load(IMG_PATH);
+    if (!img) {
+        SDL_Log("IMG_Load: %s", SDL_GetError());
     }
+    state.texture = SDL_CreateTextureFromSurface(state.renderer, img);
+    SDL_DestroySurface(img);*/
 
     updateAlwaysOnTop(&state);
     //SDL_Log("SDL3 initialized");
