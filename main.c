@@ -51,7 +51,23 @@ void updateAlwaysOnTop(struct AppState *state) {
 #ifdef _WIN32
 #include <windows.h>
 void showContextMenu(struct AppState *state, int x, int y) {
+    SDL_PropertiesID props = SDL_GetWindowProperties(state->window);
+    if (props == 0) {
+        SDL_Log("Failed to obtain SDL window properties.");
+        return;
+    }
+
+    HWND hwnd = (HWND)SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+    if (hwnd == NULL) {
+        SDL_Log("Failed to obtain hwnd from SDL window props.");
+        return;
+    }
+
     HMENU hMenu = CreatePopupMenu();
+    if (hMenu == NULL) {
+        SDL_Log("Failed to create popup menu.");
+        return;
+    }
 
     AppendMenu(hMenu, MF_STRING, 1, "Open Image... (O)");
     AppendMenu(hMenu, MF_STRING, 2, "Close Image (C)");
@@ -62,8 +78,8 @@ void showContextMenu(struct AppState *state, int x, int y) {
     AppendMenu(hMenu, MF_STRING, 7, "Use antialiasing (L)");
     AppendMenu(hMenu, MF_STRING, 8, "Quit (Q)");
 
-    int itemId = TrackPopupMenu(hMenu, TPM_LEFTALIGN, x, y, 0, GetConsoleWindow(), NULL);
-
+    int itemId = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, x, y, 0, hwnd, NULL);
+    SDL_Log("itemId: %d", itemId);
     switch (itemId) {
         case 1:
             break;
