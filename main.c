@@ -43,6 +43,12 @@ float maxf(float a, float b) {
     return (a > b) ? a : b;
 }
 
+void updateAlwaysOnTop(struct AppState *state) {
+    SDL_SetWindowAlwaysOnTop(state->window, state->alwaysOnTop);
+    SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
+}
+
+#ifdef _WIN32
 #include <windows.h>
 void showContextMenu(struct AppState *state, int x, int y) {
     HMENU hMenu = CreatePopupMenu();
@@ -65,7 +71,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
             break;
         case 3:
             state->alwaysOnTop = !state->alwaysOnTop;
-            updateAlwaysOnTop(&state);
+            updateAlwaysOnTop(state);
             break;
         case 4:
             state->keepAspectRatio = !state->keepAspectRatio;
@@ -82,11 +88,10 @@ void showContextMenu(struct AppState *state, int x, int y) {
 
     DestroyMenu(hMenu);
 }
-
-void updateAlwaysOnTop(struct AppState *state) {
-    SDL_SetWindowAlwaysOnTop(state->window, state->alwaysOnTop);
-    SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
-}
+#else
+// context menu unsuported for other platforms, for now
+void showContextMenu(struct AppState *state, int x, int y) {}
+#endif
 
 int main(int argc, char* argv[]) {
     // ----- INIT -----
@@ -131,7 +136,7 @@ int main(int argc, char* argv[]) {
     }
 
     updateAlwaysOnTop(&state);
-    SDL_Log("SDL3 initialized");
+    //SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
     // bug: the image only resizes when i stop dragging (unhold the mouse button)
@@ -146,7 +151,9 @@ int main(int argc, char* argv[]) {
                     break;
 
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
+                    SDL_Log("SDL_EVENT_MOUSE_BUTTON_DOWN");
                     if (event.button.button == SDL_BUTTON_RIGHT) {
+                        SDL_Log("SDL_BUTTON_RIGHT");
                         showContextMenu(&state, event.button.x, event.button.y);
                     }
                     break;
@@ -204,7 +211,7 @@ int main(int argc, char* argv[]) {
 
     // ----- QUIT -----
 
-    SDL_Log("SDL3 shutdown");
+    //SDL_Log("SDL3 shutdown");
     SDL_DestroyTexture(state.texture);
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
