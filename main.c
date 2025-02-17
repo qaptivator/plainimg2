@@ -14,6 +14,8 @@
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
 
+#define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
+
 // why did i have typedef here
 struct AppState {
     SDL_Window *window;
@@ -24,6 +26,7 @@ struct AppState {
     bool keepAspectRatio;
     bool useBlackBg;
     bool alwaysOnTop;
+    bool useAntialiasing;
 };
 //typedef struct _appstate AppState;
 
@@ -46,6 +49,10 @@ float maxf(float a, float b) {
 void updateAlwaysOnTop(struct AppState *state) {
     SDL_SetWindowAlwaysOnTop(state->window, state->alwaysOnTop);
     SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
+}
+
+void updateUseAntialiasing(struct AppState *state) {
+    SDL_SetTextureScaleMode(state->texture, state->useAntialiasing ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
 }
 
 #ifdef _WIN32
@@ -73,11 +80,11 @@ void showContextMenu(struct AppState *state, int x, int y) {
     // ugh why isnt there just an argument for this?
     AppendMenu(hMenu, MF_STRING, 1, "Open Image...\tO");
     AppendMenu(hMenu, MF_STRING, 2, "Close Image\tC");
-    AppendMenu(hMenu, MF_STRING, 3, "Window always on top\tT");
-    AppendMenu(hMenu, MF_STRING, 4, "Keep aspect ratio\tA");
+    AppendMenu(hMenu, CHECK_STATE(state->alwaysOnTop), 3, "Window always on top\tT");
+    AppendMenu(hMenu, CHECK_STATE(state->keepAspectRatio), 4, "Keep aspect ratio\tA");
     AppendMenu(hMenu, MF_STRING, 5, "Resize window to image\tR");
-    AppendMenu(hMenu, MF_STRING, 6, "Use black background\tB");
-    AppendMenu(hMenu, MF_STRING, 7, "Use antialiasing\tL");
+    AppendMenu(hMenu, CHECK_STATE(state->useBlackBg), 6, "Use black background\tB");
+    AppendMenu(hMenu, CHECK_STATE(state->useAntialiasing), 7, "Use antialiasing\tL");
     AppendMenu(hMenu, MF_SEPARATOR, 10, "");
     AppendMenu(hMenu, MF_STRING, 8, "Quit\tQ");
 
@@ -99,7 +106,10 @@ void showContextMenu(struct AppState *state, int x, int y) {
             break;
         case 6:
             state->useBlackBg = !state->useBlackBg;
+            break; // omg i forgot a break statement here and it almost broke the logic
         case 7:
+            state->useAntialiasing = !state->useAntialiasing;
+            updateUseAntialiasing(state);
             break;
         case 8:
             break;
@@ -121,6 +131,7 @@ int main(int argc, char* argv[]) {
     state.keepAspectRatio = true;
     state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
     state.alwaysOnTop = true;
+    state.useAntialiasing = false;
 
     state.imagePath = malloc(100 * sizeof(char));
     if (state.imagePath == NULL) {
@@ -168,6 +179,7 @@ int main(int argc, char* argv[]) {
     SDL_DestroySurface(img);*/
 
     updateAlwaysOnTop(&state);
+    updateUseAntialiasing(&state);
     //SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
@@ -183,9 +195,7 @@ int main(int argc, char* argv[]) {
                     break;
 
                 case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                    SDL_Log("SDL_EVENT_MOUSE_BUTTON_DOWN");
                     if (event.button.button == SDL_BUTTON_RIGHT) {
-                        SDL_Log("SDL_BUTTON_RIGHT");
                         showContextMenu(&state, event.button.x, event.button.y);
                     }
                     break;
@@ -208,6 +218,11 @@ int main(int argc, char* argv[]) {
                         case SDLK_T:
                             state.alwaysOnTop = !state.alwaysOnTop;
                             updateAlwaysOnTop(&state);
+                            break;
+
+                        case SDLK_L:
+                            state.useAntialiasing = !state.useAntialiasing;
+                            updateUseAntialiasing(&state);
                             break;
                     }
                     break;
