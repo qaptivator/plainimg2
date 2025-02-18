@@ -275,7 +275,7 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmap
     SDL_Log("bitmap loadRcBitmapAsTexture");
     BITMAP bitmap;
-    if (GetObject(hBitmap, sizeof(BITMAP), &hBitmap) == 0) {
+    if (GetObject(hBitmap, sizeof(BITMAP), &bitmap) == 0) {
         SDL_Log("bitmap loadRcBitmapAsTexture error %d", GetLastError());
         DeleteObject(hBitmap);
         return NULL;
