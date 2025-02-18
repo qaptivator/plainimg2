@@ -1,7 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
-#include "plainIMG.rc"
 
 #define W_WIDTH 800
 #define W_HEIGHT 600
@@ -13,6 +12,10 @@
 // TODO: add the image filename to the window's title
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
+
+// MAKE SURE THAT THESE ARE THE SAME AS IN plainIMG.rc!!!
+#define WELCOME_WHITE_ID 55
+#define WELCOME_BLACK_ID 66
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
 #define RETURN_IF_NULL(var) \
@@ -265,6 +268,7 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     SDL_Log("hBitmap loadRcBitmapAsTexture");
     HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
     // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. hmmm...
+    // now it has error 5, which means there is no access to something. hmmm...
     SDL_Log("hBitmap loadRcBitmapAsTexture error %d", GetLastError());
     RETURN_IF_NULL(hBitmap);
 
@@ -279,9 +283,8 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
         bitmap.bmHeight,
         SDL_PIXELFORMAT_BGR24,
         bitmap.bmBits,
-        //bitmap.bmBitsPixel,
         bitmap.bmWidthBytes
-        //bitmap.bmBits,
+        //bitmap.bmBitsPixel
     );
     RETURN_IF_NULL(surface);
 
