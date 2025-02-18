@@ -281,6 +281,7 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
         return NULL;
     }
     //RETURN_IF_NULL(&bitmap);
+    // i think i should ensure that the bitmap is 24bit... but im lazy
 
     //int pitch = ((int)bitmap.bmWidthBytes) - 1;
     //int pitch = bitmap.bmWidth * (bitmap.bmBitsPixel / 8);
@@ -288,17 +289,26 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     SDL_Surface* surface = SDL_CreateSurfaceFrom(
         (int)bitmap.bmWidth,
         (int)bitmap.bmHeight,
-        SDL_PIXELFORMAT_RGB24, // SDL_PIXELFORMAT_BGR24
+        SDL_PIXELFORMAT_BGR24, // SDL_PIXELFORMAT_BGR24, SDL_PIXELFORMAT_RGB24
         (void*)bitmap.bmBits,
         (int)bitmap.bmWidthBytes
     );
-    DeleteObject(hBitmap);
-    RETURN_IF_NULL(surface);
+    SDL_Log("surface loadRcBitmapAsTexture w %d", surface->format);
+    //RETURN_IF_NULL(surface);
+    if (surface == NULL) {
+        SDL_Log("surface loadRcBitmapAsTexture error %d", GetLastError());
+        DeleteObject(hBitmap);
+        return NULL;
+    }
+
+    //SDL_IOStream
+    //IMG_LoadBMP_IO
 
     SDL_Log("texture loadRcBitmapAsTexture");
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_DestroySurface(surface);
-    RETURN_IF_NULL(texture);
+    DeleteObject(hBitmap);
+    //RETURN_IF_NULL(texture);
 
     SDL_Log("return loadRcBitmapAsTexture");
     return texture;
