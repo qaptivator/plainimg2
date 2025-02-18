@@ -31,13 +31,17 @@ if $static; then
   if [ -f "./src/plainIMG_rc.o" ]; then
     gcc -o "${appName}-standalone.exe" src/plainIMG_rc.o  src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
   else
-    gcc -o "${appName}-standalone.exe" src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+    echo "sorry but you NEED to have the resource file built in src called 'plainIMG_rc.o', because it is required by the program to run."
+    exit 1
+    #gcc -o "${appName}-standalone.exe" src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
   fi
 else
   if [ -f "./src/plainIMG_rc.o" ]; then
     gcc -o "${appName}.exe" src/plainIMG_rc.o  src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
   else
-    gcc -o "${appName}.exe" src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+    echo "sorry but you NEED to have the resource file built in src called 'plainIMG_rc.o', because it is required by the program to run."
+    exit 1
+    #gcc -o "${appName}.exe" src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
   fi
 fi
 

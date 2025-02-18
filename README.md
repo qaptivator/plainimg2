@@ -58,8 +58,8 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 - SDL3 is included inside this repository, so just clone this repository
 - you need vs c/c++ redistributable and gcc installed
 - run `./build.sh`, and it will build everything for you with gcc. run with `./plainIMG.exe` (or `./build.sh && ./plainIMG.exe` for short)
-- if youre not building with standalone version, you NEED to have `SDL3.dll`, `SDL3_image.dll` and `icon.ico` located in the same directory as the executable
-- build the icon with `windres plainIMG.rc -o plainIMG_rc.o`
+- if youre not statically building with `-s`, you NEED to have `SDL3.dll` and `SDL3_image.dll` located in the same directory as the executable.
+- build the resoures (icon + welcome text) with `windres src/plainIMG.rc -O coff -o src/plainIMG_rc.o`
 
 libraries used: [SDL 3](https://github.com/libsdl-org/SDL), [SDL3_image 3](https://github.com/libsdl-org/SDL_image/),
 

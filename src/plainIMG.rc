@@ -1,1 +1,3 @@
 id ICON "icon.ico"
+welcomeWhite BITMAP "welcome_white.bmp"
+welcomeBlack BITMAP "welcome_black.bmp"
