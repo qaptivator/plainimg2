@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include "plainIMG.rc"
 
 #define W_WIDTH 800
 #define W_HEIGHT 600
@@ -12,10 +13,6 @@
 // TODO: add the image filename to the window's title
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
-
-// USE THE SAME NUMBERS IN plainIMG.rc!!!!
-#define WELCOME_WHITE_PATH 5
-#define WELCOME_BLACK_PATH 6
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
 #define RETURN_IF_NULL(var) \
@@ -489,12 +486,12 @@ int main(int argc, char* argv[]) {
     // i can also just color a single white image, but im lazy, so i will have both for both light and dark mode
     //state.welcomeWhite = IMG_LoadTexture(state.renderer, WELCOME_WHITE_PATH);
 
-    state.welcomeWhite = loadRcBitmapAsTexture(state.renderer, WELCOME_WHITE_PATH);
+    state.welcomeWhite = loadRcBitmapAsTexture(state.renderer, WELCOME_WHITE_ID);
     if (state.welcomeWhite == NULL) {
         SDL_Log("loadRcBitmapAsTexture welcomeWhite error: %s", SDL_GetError());
         return -3;
     }
-    state.welcomeBlack = loadRcBitmapAsTexture(state.renderer, WELCOME_BLACK_PATH);
+    state.welcomeBlack = loadRcBitmapAsTexture(state.renderer, WELCOME_BLACK_ID);
     if (state.welcomeBlack == NULL) {
         SDL_Log("loadRcBitmapAsTexture welcomeBlack error: %s", SDL_GetError());
         return -4;

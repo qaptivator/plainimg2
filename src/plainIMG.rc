@@ -1,3 +1,6 @@
+#define WELCOME_WHITE_ID 55
+#define WELCOME_BLACK_ID 66
+
 id ICON "icon.ico"
-welcomeWhite BITMAP "welcome_white.bmp"
-welcomeBlack BITMAP "welcome_black.bmp"
+WELCOME_WHITE_ID BITMAP "welcome_white.bmp"
+WELCOME_BLACK_ID BITMAP "welcome_black.bmp"
