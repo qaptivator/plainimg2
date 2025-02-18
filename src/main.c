@@ -301,14 +301,18 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
         return NULL;
     }
 
-    //SDL_IOStream
-    //IMG_LoadBMP_IO
+    //SDL_Rect flipRect = {0, 0, surface->w, surface->h};
+    //SDL_BlitSurface(surface, &flipRect, surface, &flipRect);
+    // https://wiki.libsdl.org/SDL3/SDL_FlipMode
+    //SDL_FlipSurface(surface, SDL_FLIP_HORIZONTAL);
+    SDL_FlipSurface(surface, SDL_FLIP_VERTICAL);
 
     SDL_Log("texture loadRcBitmapAsTexture");
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_DestroySurface(surface);
     DeleteObject(hBitmap);
     //RETURN_IF_NULL(texture);
+
 
     SDL_Log("return loadRcBitmapAsTexture");
     return texture;
