@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include <string.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
@@ -8,6 +6,7 @@
 #define W_HEIGHT 600
 #define WMIN_WIDTH 150
 #define WMIN_HEIGHT 150
+#define MAX_PATH 1000
 #define REPO_URL "https://github.com/qaptivator/plainimg2"
 
 // TODO: add the image filename to the window's title
@@ -97,7 +96,6 @@ HWND getHwndFromWindow(SDL_Window *window) {
 // unfortunately this function is windows-only now womp womp
 void openImage(struct AppState *state, const char *path) {
     if (path == NULL) {
-        SDL_Log("no path");
         state->textureLoaded = false;
         return;
     }
@@ -134,6 +132,34 @@ void openImage(struct AppState *state, const char *path) {
     state->textureLoaded = true;
 }
 
+void openImageWithDialog(struct AppState *state) {
+    // i think you should use SDL_filedialog instead
+    // and SDL_ttf for text instead of an static image
+    HWND hwnd = getHwndFromWindow(state->window);
+
+    char filePath[MAX_PATH] = {0};
+
+    OPENFILENAME ofn;
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = filePath;
+    ofn.nMaxFile = sizeof(filePath);
+    ofn.lpstrFilter = "Image Files\0*.BMP;*.JPG;*.JPEG;*.PNG;*.GIF;*.TIFF;*.WEBP\0All Files\0*.*\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL; 
+    ofn.lpstrTitle = "Open Image";
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+    if (GetOpenFileName(&ofn) == TRUE) {
+        openImage(state, ofn.lpstrFile);
+    } else {
+        MessageBox(hwnd, TEXT("No image was selected!"), TEXT("plainIMG Warning"), MB_OK | MB_ICONWARNING);
+    }
+}
+
 void showContextMenu(struct AppState *state, int x, int y) {
     HWND hwnd = getHwndFromWindow(state->window);
 
@@ -159,6 +185,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
     int itemId = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, x, y, 0, hwnd, NULL);
     switch (itemId) {
         case 1:
+            openImageWithDialog(state);
             break;
         case 2:
             openImage(state, NULL);
@@ -201,6 +228,7 @@ void showContextMenu(struct AppState *state, int x, int y) {}
 // is it fine that i use HWND even if its not defined?
 // i dont even know what HWND is...
 HWND getHwndFromWindow(SDL_Window *window) {}
+// i dont even care about these definitions anymore
 #endif
 
 void drawFrame(struct AppState *state) {
@@ -212,17 +240,17 @@ void drawFrame(struct AppState *state) {
     SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
 
     if (state->textureLoaded) {
+        int _textureWidth = state->texture->w;
+        int _textureHeight = state->texture->h;
+
+        float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
+
+        state->textureRect->w = (int)(_textureWidth * _scale);
+        state->textureRect->h = (int)(_textureHeight * _scale);
+        state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+        state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+        
         if (state->keepAspectRatio) {
-            int _textureWidth = state->texture->w;
-            int _textureHeight = state->texture->h;
-
-            float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
-
-            state->textureRect->w = (int)(_textureWidth * _scale);
-            state->textureRect->h = (int)(_textureHeight * _scale);
-            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
-            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
-
             SDL_RenderTexture(state->renderer, state->texture, NULL, state->textureRect);
         } else {
             SDL_RenderTexture(state->renderer, state->texture, NULL, NULL);
@@ -318,6 +346,10 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
 
                 case SDLK_C:
                     openImage(state, NULL);
+                    break;
+
+                case SDLK_O:
+                    openImageWithDialog(state);
                     break;
             }
             break;

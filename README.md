@@ -1,4 +1,4 @@
-# plainIMG2
+# [plainIMG2](https://github.com/qaptivator/plainimg2)
 
 _///// as simple as it gets for an image viewer /////_
 

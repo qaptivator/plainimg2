@@ -22,9 +22,9 @@ args=()
 $static && args+=("-static")
 
 if [ -f "./src/plainIMG_rc.o" ]; then
-  gcc -o "${appName}.exe" src/plainIMG_rc.o "${args[@]}" src/main.c -I ./src/SDL3/include -I ./src/SDL3_Image/include -L ./src/SDL3/lib -L ./src/SDL3_Image/lib -l SDL3 -l SDL3_image
+  gcc "${args[@]}" -o "${appName}.exe" src/plainIMG_rc.o  src/main.c -I ./src/SDL3/include -I ./src/SDL3_Image/include -L ./src/SDL3/lib -L ./src/SDL3_Image/lib -l SDL3 -l SDL3_image -l Comdlg32
 else
-  gcc -o "${appName}.exe" "${args[@]}" src/main.c -I ./src/SDL3/include -I ./src/SDL3_Image/include -L ./src/SDL3/lib -L ./src/SDL3_Image/lib -l SDL3 -l SDL3_image
+  gcc "${args[@]}" -o "${appName}.exe" src/main.c -I ./src/SDL3/include -I ./src/SDL3_Image/include -L ./src/SDL3/lib -L ./src/SDL3_Image/lib -l SDL3 -l SDL3_image -l Comdlg32
 fi
 
 if $autorun; then
