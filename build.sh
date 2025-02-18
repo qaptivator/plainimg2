@@ -31,9 +31,9 @@ $static && args+=("-lwinmm" "-lole32" "-lsetupapi" "-limm32" "-lversion" "-lolea
 
 # ohhh so i cant use spaces here
 if $static; then
-  gcc src/main.c src/${appName}_rc.res -o "${appName}-standalone.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+  gcc src/main.c src/${appName}_rc.res -o "${appName}_standalone.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
   if $autorun; then
-    "./${appName}-standalone.exe"
+    "./${appName}_standalone.exe"
   fi
 else
   gcc src/main.c src/${appName}_rc.res -o "${appName}.exe" -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
