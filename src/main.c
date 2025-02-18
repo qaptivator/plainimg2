@@ -18,11 +18,11 @@
 #define WELCOME_BLACK_PATH 6
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
-#define RETURN_IF_NULL(var)\
-    do {\
-        if ((var) == NULL) {\  
-            return NULL;\
-        }\
+#define RETURN_IF_NULL(var) \
+    do {                    \
+        if ((var) == NULL) {\
+            return NULL;    \
+        }                   \
     } while(0)
 
 
@@ -258,16 +258,20 @@ SDL_Texture* createTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surfa
 }*/
 
 SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
+    SDL_Log("hInstance loadRcBitmapAsTexture");
     HINSTANCE hInstance = GetModuleHandle(NULL);
     RETURN_IF_NULL(hInstance);
 
+    SDL_Log("hBitmap loadRcBitmapAsTexture");
     HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
     RETURN_IF_NULL(hBitmap);
 
+    SDL_Log("bitmap loadRcBitmapAsTexture");
     BITMAP bitmap;
     GetObject(hBitmap, sizeof(BITMAP), &hBitmap);
     RETURN_IF_NULL(&bitmap);
 
+    SDL_Log("surface loadRcBitmapAsTexture");
     SDL_Surface* surface = SDL_CreateSurfaceFrom(
         bitmap.bmWidth,
         bitmap.bmHeight,
@@ -279,10 +283,12 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     );
     RETURN_IF_NULL(surface);
 
+    SDL_Log("texture loadRcBitmapAsTexture");
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_DestroySurface(surface);
     RETURN_IF_NULL(texture);
 
+    SDL_Log("return loadRcBitmapAsTexture");
     return texture;
 }
 #else
