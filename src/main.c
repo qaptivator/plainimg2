@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include "plainIMG_rc.h"
 
 #define W_WIDTH 800
 #define W_HEIGHT 600
@@ -12,10 +13,6 @@
 // TODO: add the image filename to the window's title
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
-
-// MAKE SURE THAT THESE ARE THE SAME AS IN plainIMG.rc!!!
-#define WELCOME_WHITE_ID 1005
-#define WELCOME_BLACK_ID 1006
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
 #define RETURN_IF_NULL(var) \
@@ -261,13 +258,19 @@ SDL_Texture* createTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surfa
 // https://stackoverflow.com/questions/20584045/win32-application-hbitmap-loadimage-fails-to-load-anything
 // https://stackoverflow.com/questions/32880911/win32-loadbitmap-returns-error-1814
 SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
-    SDL_Log("hInstance loadRcBitmapAsTexture");
-    HINSTANCE hInstance = GetModuleHandle(NULL);
-    RETURN_IF_NULL(hInstance);
+    //SDL_Log("hInstance loadRcBitmapAsTexture");
+    //HINSTANCE hInstance = GetModuleHandle(NULL);
+    //RETURN_IF_NULL(hInstance);
+    //https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew
+    //https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes
+    //https://learn.microsoft.com/en-us/windows/win32/menurc/finding-and-loading-resources
+    //https://learn.microsoft.com/en-us/windows/win32/menurc/resource-definition-statements?redirectedfrom=MSDN
+    //https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew
 
     SDL_Log("hBitmap loadRcBitmapAsTexture");
     //HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, 0); // LR_CREATEDIBSECTION
-    HBITMAP hBitmap = (HBITMAP)LoadBitmap(hInstance, MAKEINTRESOURCE(resourceId));
+    //HBITMAP hBitmap = (HBITMAP)LoadBitmap(hInstance, MAKEINTRESOURCE(resourceId));
+    HBITMAP hBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
 
     // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. hmmm...
     // now it has error 5, which means there is no access to something. hmmm...
@@ -501,12 +504,12 @@ int main(int argc, char* argv[]) {
     // i can also just color a single white image, but im lazy, so i will have both for both light and dark mode
     //state.welcomeWhite = IMG_LoadTexture(state.renderer, WELCOME_WHITE_PATH);
 
-    state.welcomeWhite = loadRcBitmapAsTexture(state.renderer, WELCOME_WHITE_ID);
+    state.welcomeWhite = loadRcBitmapAsTexture(state.renderer, IDB_WELCOMEWHITE);
     if (state.welcomeWhite == NULL) {
         SDL_Log("loadRcBitmapAsTexture welcomeWhite error: %s", SDL_GetError());
         return -3;
     }
-    state.welcomeBlack = loadRcBitmapAsTexture(state.renderer, WELCOME_BLACK_ID);
+    state.welcomeBlack = loadRcBitmapAsTexture(state.renderer, IDB_WELCOMEBLACK);
     if (state.welcomeBlack == NULL) {
         SDL_Log("loadRcBitmapAsTexture welcomeBlack error: %s", SDL_GetError());
         return -4;

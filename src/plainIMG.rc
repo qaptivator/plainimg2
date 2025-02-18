@@ -1,7 +1,5 @@
-#define ICON_ID 1004
-#define WELCOME_WHITE_ID 1005
-#define WELCOME_BLACK_ID 1006
+#include "plainIMG_rc.h"
 
-ICON_ID ICON "icon.ico"
-WELCOME_WHITE_ID BITMAP "welcome_white.bmp"
-WELCOME_BLACK_ID BITMAP "welcome_black.bmp"
+IDI_ICON ICON "icon.ico"
+IDB_WELCOMEWHITE BITMAP "welcome_white.bmp"
+IDB_WELCOMEBLACK BITMAP "welcome_black.bmp"
