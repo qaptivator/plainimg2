@@ -14,8 +14,10 @@ while getopts "hays" OPTION; do
 done
 
 # you NEED to have dlls in the same directory
-cp src/SDL3/bin/SDL3.dll .
-cp src/SDL3_Image/bin/SDL3_image.dll .
+if ! $static; then
+  cp src/SDL3/bin/SDL3.dll .
+  cp src/SDL3_Image/bin/SDL3_image.dll .
+fi
 
 args=()
 ! $yesconsole && args+=("-mwindows")
