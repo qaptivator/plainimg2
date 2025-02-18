@@ -263,7 +263,6 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     SDL_Log("hBitmap loadRcBitmapAsTexture");
     // LR_CREATEDIBSECTION is not needed here. its only needed for alpha channel images which ARENT SUPPORTED HERE grrr
     HBITMAP hBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
-
     // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. solution: make sure that numeric ids match both in c files and in resource rc files.
     // now it has error 5, which means there is no access to something. solution: make sure that your bitmap is 24bit format (without alpha channel). you can check this with "file" command.
     if (hBitmap == NULL) {
@@ -284,14 +283,14 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     //RETURN_IF_NULL(&bitmap);
 
     //int pitch = ((int)bitmap.bmWidthBytes) - 1;
-    int pitch = bitmap.bmWidth * (bitmap.bmBitsPixel / 8);
-    SDL_Log("surface loadRcBitmapAsTexture %d", pitch);
+    //int pitch = bitmap.bmWidth * (bitmap.bmBitsPixel / 8);
+    SDL_Log("surface loadRcBitmapAsTexture: w%d h%d wb%d id%d", bitmap.bmWidth, bitmap.bmHeight, bitmap.bmWidthBytes, resourceId);
     SDL_Surface* surface = SDL_CreateSurfaceFrom(
         (int)bitmap.bmWidth,
         (int)bitmap.bmHeight,
-        SDL_PIXELFORMAT_BGR24,
+        SDL_PIXELFORMAT_RGB24, // SDL_PIXELFORMAT_BGR24
         (void*)bitmap.bmBits,
-        pitch
+        (int)bitmap.bmWidthBytes
     );
     DeleteObject(hBitmap);
     RETURN_IF_NULL(surface);
