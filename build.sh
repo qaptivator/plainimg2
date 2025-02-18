@@ -4,7 +4,7 @@ yesconsole=false
 static=false
 release=false
 
-while getopts "hays" OPTION; do
+while getopts "hrays" OPTION; do
   case $OPTION in
     a) autorun=true ;;
     y) yesconsole=true ;;
@@ -42,9 +42,9 @@ if ! $release; then
 
   # ohhh so i cant use spaces here
   if $static; then
-    gcc -m64 src/main.c src/${appName}_rc.res -o "build/debug/${appName}_standalone.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+    gcc -m64 src/main.c src/${appName}_rc.res -o "build/debug/${appName}_static.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
     if $autorun; then
-      "./build/debug/${appName}_standalone.exe"
+      "./build/debug/${appName}_static.exe"
     fi
   else
     gcc -m64 src/main.c src/${appName}_rc.res -o "build/debug/${appName}.exe" -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
@@ -59,7 +59,7 @@ else
 
   if ! $static; then
     if [ ! -d "build/release/dynamic" ]; then
-      mkdir release
+      mkdir build/release/dynamic
     fi
     if [ ! -f "build/release/dynamic/SDL3.dll" ]; then
       cp src/SDL3/bin/SDL3.dll build/release/dynamic
@@ -71,14 +71,22 @@ else
 
   # ohhh so i cant use spaces here
   if $static; then
-    gcc -m64 src/main.c src/${appName}_rc.res -o "build/release/standalone/${appName}_standalone.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+    if [ ! -d "build/release/static" ]; then
+      mkdir build/release/static
+    fi
+    gcc -m64 src/main.c src/${appName}_rc.res -o "build/release/static/${appName}_static.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
     if $autorun; then
-      "./${appName}_standalone.exe"
+      "./${appName}_static.exe"
     fi
   else
+    if [ ! -d "build/release/dynamic" ]; then
+      mkdir build/release/dynamic
+    fi
     gcc -m64 src/main.c src/${appName}_rc.res -o "build/release/dynamic/${appName}.exe" -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
     if $autorun; then
       "./${appName}.exe"
     fi
   fi
 fi
+
+echo "build complete"
