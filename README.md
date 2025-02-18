@@ -34,6 +34,21 @@ to support the developer, you can appreciate the project by giving it a star in 
 - the link to this github repository is located inside the `About` menu.
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
 
+# screenshots
+
+![screenshot1](examples/screenshot1.png)
+![screenshot2](examples/screenshot2.png)
+![screenshot3](examples/screenshot3.png)
+![screenshot4](examples/screenshot4.png)
+![screenshot5](examples/screenshot5.png)
+![screenshot6](examples/screenshot6.png)
+![screenshot7](examples/screenshot7.png)
+
+---
+
+[VirusTotal check](https://www.virustotal.com/gui/file/790c8e66aa1ef920f819445e8b439ae7a3da877279220f05eac885881ed25e54/detection)
+![screenshot8](examples/screenshot8.png)
+
 # introduction
 
 sometimes, i just want to open an image, and pin it somewhere on my display.  
