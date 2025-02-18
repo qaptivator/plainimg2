@@ -62,6 +62,43 @@ float maxf(float a, float b) {
     return (a > b) ? a : b;
 }
 
+void calculateTextureRect(struct AppState *state) {
+    int _windowWidth, _windowHeight;
+    SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
+
+    if (state->textureLoaded) {
+        int _textureWidth = state->texture->w;
+        int _textureHeight = state->texture->h;
+
+        float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
+
+        state->textureRect->w = (int)(_textureWidth * _scale);
+        state->textureRect->h = (int)(_textureHeight * _scale);
+        state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+        state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+        
+        if (state->keepAspectRatio) {
+            SDL_RenderTexture(state->renderer, state->texture, NULL, state->textureRect);
+        } else {
+            SDL_RenderTexture(state->renderer, state->texture, NULL, NULL);
+        }
+    } else {
+        if (state->useBlackBg) {
+            state->textureRect->w = state->welcomeBlack->w;
+            state->textureRect->h = state->welcomeBlack->h;
+            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+            SDL_RenderTexture(state->renderer, state->welcomeBlack, NULL, state->textureRect);
+        } else {
+            state->textureRect->w = state->welcomeWhite->w;
+            state->textureRect->h = state->welcomeWhite->h;
+            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
+            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
+            SDL_RenderTexture(state->renderer, state->welcomeWhite, NULL, state->textureRect);
+        }
+    }
+}
+
 void updateAlwaysOnTop(struct AppState *state) {
     SDL_SetWindowAlwaysOnTop(state->window, state->alwaysOnTop);
     SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
@@ -74,7 +111,7 @@ void updateUseAntialiasing(struct AppState *state) {
 }
 
 void resizeWindowToImage(struct AppState *state) {
-    drawFrame(state); // recalculate textureRect
+    calculateTextureRect(state); // recalculate textureRect
     if (state->textureLoaded && state->keepAspectRatio && state->textureRect->w > 0 && state->textureRect->h > 0) {
         SDL_SetWindowSize(state->window, state->textureRect->w, state->textureRect->h);
     }
@@ -327,20 +364,8 @@ void drawFrame(struct AppState *state) {
     SDL_SetRenderDrawColor(state->renderer, _bgColor, _bgColor, _bgColor, 0xff);
     SDL_RenderClear(state->renderer);
 
-    int _windowWidth, _windowHeight;
-    SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
-
+    calculateTextureRect(state);
     if (state->textureLoaded) {
-        int _textureWidth = state->texture->w;
-        int _textureHeight = state->texture->h;
-
-        float _scale = minf((float)_windowWidth / (float)_textureWidth, (float)_windowHeight / (float)_textureHeight);
-
-        state->textureRect->w = (int)(_textureWidth * _scale);
-        state->textureRect->h = (int)(_textureHeight * _scale);
-        state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
-        state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
-        
         if (state->keepAspectRatio) {
             SDL_RenderTexture(state->renderer, state->texture, NULL, state->textureRect);
         } else {
@@ -348,16 +373,8 @@ void drawFrame(struct AppState *state) {
         }
     } else {
         if (state->useBlackBg) {
-            state->textureRect->w = state->welcomeBlack->w;
-            state->textureRect->h = state->welcomeBlack->h;
-            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
-            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
             SDL_RenderTexture(state->renderer, state->welcomeBlack, NULL, state->textureRect);
         } else {
-            state->textureRect->w = state->welcomeWhite->w;
-            state->textureRect->h = state->welcomeWhite->h;
-            state->textureRect->x = (_windowWidth - state->textureRect->w) / 2;
-            state->textureRect->y = (_windowHeight - state->textureRect->h) / 2;
             SDL_RenderTexture(state->renderer, state->welcomeWhite, NULL, state->textureRect);
         }
     }
