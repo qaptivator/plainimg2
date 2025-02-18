@@ -20,8 +20,10 @@ if ! $static; then
 fi
 
 #if [ ! -f "./src/plainIMG_rc.o" ]; then
-windres src/plainIMG.rc src/plainIMG_rc.o
+#windres src/plainIMG.rc src/plainIMG_rc.o
 #fi
+
+windres -i src/plainIMG.rc --input-format=rc -o src/plainIMG_rc.res -O coff
 
 args=()
 ! $yesconsole && args+=("-mwindows")
@@ -32,21 +34,22 @@ $static && args+=("-lwinmm" "-lole32" "-lsetupapi" "-limm32" "-lversion" "-lolea
 
 # ohhh so i CANT use spaces here
 if $static; then
-  if [ -f "./src/plainIMG_rc.o" ]; then
-    gcc -o "${appName}-standalone.exe" src/plainIMG_rc.o src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
-  else
-    echo "sorry but you NEED to have the resource file built in src called 'plainIMG_rc.o', because it is required by the program to run."
-    exit 1
-    #gcc -o "${appName}-standalone.exe" src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
-  fi
+  gcc -o "${appName}-standalone.exe" src/plainIMG_rc.res src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+  #if [ -f "./src/plainIMG_rc.res" ]; then
+  #else
+  #  echo "sorry but you NEED to have the resource file built in src called 'plainIMG_rc.o', because it is required by the program to run."
+  #  exit 1
+  #  #gcc -o "${appName}-standalone.exe" src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+  #fi
 else
-  if [ -f "./src/plainIMG_rc.o" ]; then
-    gcc -o "${appName}.exe" src/plainIMG_rc.o src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
-  else
-    echo "sorry but you NEED to have the resource file built in src called 'plainIMG_rc.o', because it is required by the program to run."
-    exit 1
-    #gcc -o "${appName}.exe" src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
-  fi
+  gcc -o "${appName}.exe" src/plainIMG_rc.res src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+  #if [ -f "./src/plainIMG_rc.res" ]; then
+  #  
+  #else
+  #  echo "sorry but you NEED to have the resource file built in src called 'plainIMG_rc.o', because it is required by the program to run."
+  #  exit 1
+  #  #gcc -o "${appName}.exe" src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+  #fi
 fi
 
 if $autorun; then
