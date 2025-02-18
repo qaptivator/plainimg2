@@ -19,7 +19,7 @@ cp src/SDL3_Image/bin/SDL3_image.dll .
 
 args=()
 ! $yesconsole && args+=("-mwindows")
-$static && args+=("-static")
+$static && args+=("-static" "-l winmm" "-l ole32" "-l setupapi" "-l imm32" "-l version" "-l oleaut32" "-l uuid" "-l mfplat")
 
 if [ -f "./src/plainIMG_rc.o" ]; then
   gcc "${args[@]}" -o "${appName}.exe" src/plainIMG_rc.o  src/main.c -I ./src/SDL3/include -I ./src/SDL3_Image/include -L ./src/SDL3/lib -L ./src/SDL3_Image/lib -l SDL3 -l SDL3_image -l Comdlg32
