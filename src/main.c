@@ -17,6 +17,13 @@
 #define WELCOME_BLACK_PATH "welcome_black.png"
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
+#define RETURN_IF_NULL(var)  \
+    do {                  \
+        if ((var) == NULL) { \  
+            return NULL;   \
+        }                 \
+    } while(0)
+
 
 // why did i have typedef here
 struct AppState {
@@ -222,6 +229,60 @@ void showContextMenu(struct AppState *state, int x, int y) {
 
     DestroyMenu(hMenu);
 }
+
+/*HBITMAP loadBitmapFromResource(HINSTANCE hInstance, int resourceId) {
+    return (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+}
+
+SDL_Surface* convertBitmapToSDLSurface(HBITMAP hBitmap) {
+    BITMAP bm;
+    GetObject(hBitmap, sizeof(BITMAP), &bm);
+
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(
+        bm.bmBits,
+        bm.bmWidth,
+        bm.bmHeight,
+        bm.bmBitsPixel,
+        bm.bmWidthBytes,
+        SDL_PIXELFORMAT_BGR24
+    );
+
+    return surface;
+}
+
+SDL_Texture* createTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surface) {
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    return texture;
+}*/
+
+SDL_Texture* loadRcBitmapAsTexture(struct AppState *state, int resourceId) {
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    RETURN_IF_NULL(hInstance);
+
+    HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+    RETURN_IF_NULL(hBitmap);
+
+    BITMAP bitmap;
+    GetObject(hBitmap, sizeof(BITMAP), &hBitmap);
+    RETURN_IF_NULL(&bitmap);
+
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(
+        bitmap.bmBits,
+        bitmap.bmWidth,
+        bitmap.bmHeight,
+        bitmap.bmBitsPixel,
+        bitmap.bmWidthBytes,
+        SDL_PIXELFORMAT_BGR24
+    );
+    RETURN_IF_NULL(surface);
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(state->renderer, surface);
+    SDL_FreeSurface(surface);
+    RETURN_IF_NULL(texture);
+
+    return texture;
+}
 #else
 // context menu unsuported for other platforms, for now
 void showContextMenu(struct AppState *state, int x, int y) {}
@@ -413,12 +474,14 @@ int main(int argc, char* argv[]) {
 
     // textures
     // i can also just color a single white image, but im lazy, so i will have both for both light and dark mode
-    state.welcomeWhite = IMG_LoadTexture(state.renderer, WELCOME_WHITE_PATH);
+    //state.welcomeWhite = IMG_LoadTexture(state.renderer, WELCOME_WHITE_PATH);
+
+    state.welcomeWhite = loadRcBitmapAsTexture(&state, WELCOME_WHITE_PATH);
     if (state.welcomeWhite == NULL) {
         SDL_Log("IMG_LoadTexture welcomeWhite error: %s", SDL_GetError());
         return -3;
     }
-    state.welcomeBlack = IMG_LoadTexture(state.renderer, WELCOME_BLACK_PATH);
+    state.welcomeBlack = loadRcBitmapAsTexture(&state, WELCOME_BLACK_PATH);
     if (state.welcomeBlack == NULL) {
         SDL_Log("IMG_LoadTexture welcomeBlack error: %s", SDL_GetError());
         return -4;
