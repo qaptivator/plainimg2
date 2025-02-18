@@ -15,8 +15,12 @@ done
 
 # you NEED to have dlls in the same directory if its not static
 if ! $static; then
-  cp src/SDL3/bin/SDL3.dll .
-  cp src/SDL3_Image/bin/SDL3_image.dll .
+  if [ ! -f "SDL3.dll" ]; then
+    cp src/SDL3/bin/SDL3.dll .
+  fi
+  if [ ! -f "SDL3_image.dll" ]; then
+    cp src/SDL3_Image/bin/SDL3_image.dll .
+  fi
 fi
 
 windres -i src/plainIMG.rc --input-format=rc -o src/plainIMG_rc.res -O coff
