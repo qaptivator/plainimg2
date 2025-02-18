@@ -260,8 +260,7 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     // I HATE CONVERTIO!!!!!!!!!!! IT CONVERTED PNG TO BMP WRONGLY
     // (oh wait, it included alpha channel for me. looks like i shouldve just knew this beforehand...)
 
-    SDL_Log("hBitmap loadRcBitmapAsTexture");
-    // LR_CREATEDIBSECTION is not needed here. its only needed for alpha channel images which ARENT SUPPORTED HERE grrr
+    //SDL_Log("hBitmap loadRcBitmapAsTexture");
     HBITMAP hBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR | LR_CREATEDIBSECTION);
     // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. solution: make sure that numeric ids match both in c files and in resource rc files.
     // now it has error 5, which means there is no access to something. solution: make sure that your bitmap is 24bit format (without alpha channel). you can check this with "file" command.
@@ -273,7 +272,7 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     //RETURN_IF_NULL(hBitmap);
 
     // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmap
-    SDL_Log("bitmap loadRcBitmapAsTexture");
+    //SDL_Log("bitmap loadRcBitmapAsTexture");
     BITMAP bitmap;
     if (GetObject(hBitmap, sizeof(BITMAP), &bitmap) == 0) {
         SDL_Log("bitmap loadRcBitmapAsTexture error %d", GetLastError());
@@ -283,23 +282,16 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     //RETURN_IF_NULL(&bitmap);
     // i think i should ensure that the bitmap is 24bit... but im lazy
 
-    //int pitch = ((int)bitmap.bmWidthBytes) - 1;
-    //int pitch = bitmap.bmWidth * (bitmap.bmBitsPixel / 8);
-    SDL_Log("surface loadRcBitmapAsTexture: w%d h%d wb%d id%d", bitmap.bmWidth, bitmap.bmHeight, bitmap.bmWidthBytes, resourceId);
+    //SDL_Log("surface loadRcBitmapAsTexture: w%d h%d wb%d id%d", bitmap.bmWidth, bitmap.bmHeight, bitmap.bmWidthBytes, resourceId);
     SDL_Surface* surface = SDL_CreateSurfaceFrom(
         (int)bitmap.bmWidth,
         (int)bitmap.bmHeight,
-        SDL_PIXELFORMAT_BGR24, // SDL_PIXELFORMAT_BGR24, SDL_PIXELFORMAT_RGB24
+        SDL_PIXELFORMAT_BGR24,
         (void*)bitmap.bmBits,
         (int)bitmap.bmWidthBytes
     );
-    SDL_Log("surface loadRcBitmapAsTexture w %d", surface->format);
+    //SDL_Log("surface loadRcBitmapAsTexture w %d", surface->format);
     //RETURN_IF_NULL(surface);
-    if (surface == NULL) {
-        SDL_Log("surface loadRcBitmapAsTexture error %d", GetLastError());
-        DeleteObject(hBitmap);
-        return NULL;
-    }
 
     //SDL_Rect flipRect = {0, 0, surface->w, surface->h};
     //SDL_BlitSurface(surface, &flipRect, surface, &flipRect);
@@ -307,15 +299,16 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     //SDL_FlipSurface(surface, SDL_FLIP_HORIZONTAL);
     SDL_FlipSurface(surface, SDL_FLIP_VERTICAL);
 
-    SDL_Log("texture loadRcBitmapAsTexture");
+    //SDL_Log("texture loadRcBitmapAsTexture");
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_DestroySurface(surface);
     DeleteObject(hBitmap);
     //RETURN_IF_NULL(texture);
 
-
-    SDL_Log("return loadRcBitmapAsTexture");
+    //SDL_Log("return loadRcBitmapAsTexture");
     return texture;
+
+    // this was one of the most painful functions to make in this project
 }
 #else
 // context menu unsuported for other platforms, for now
