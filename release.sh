@@ -11,6 +11,8 @@ if [ ! -d "build/release/upload" ]; then
     mkdir -p build/release/upload
 fi
 
+strip --strip-all "build/release/static/plainIMG_static.exe"
+
 cp "build/release/installer/plainIMG_installer.exe" "build/release/upload/plainIMG_installer.exe"
 cp "build/release/static/plainIMG_static.exe" "build/release/upload/plainIMG_onefile.exe"
 powershell Compress-Archive -Force -Path "build\release\dynamic\*" -DestinationPath "build\release\upload\plainIMG_dynamic.zip"
