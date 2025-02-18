@@ -19,6 +19,10 @@ if ! $static; then
   cp src/SDL3_Image/bin/SDL3_image.dll .
 fi
 
+#if [ ! -f "./src/plainIMG_rc.o" ]; then
+windres src/plainIMG.rc src/plainIMG_rc.o
+#fi
+
 args=()
 ! $yesconsole && args+=("-mwindows")
 $static && args+=("-lwinmm" "-lole32" "-lsetupapi" "-limm32" "-lversion" "-loleaut32" "-luuid" "-lmfplat")
