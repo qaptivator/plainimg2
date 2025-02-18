@@ -19,17 +19,24 @@ cp src/SDL3_Image/bin/SDL3_image.dll .
 
 args=()
 ! $yesconsole && args+=("-mwindows")
-$static && args+=("-static" "-lwinmm" "-lole32" "-lsetupapi" "-limm32" "-lversion" "-loleaut32" "-luuid" "-lmfplat")
-
+$static && args+=("-lwinmm" "-lole32" "-lsetupapi" "-limm32" "-lversion" "-loleaut32" "-luuid" "-lmfplat")
 
 # "-l winmm" "-l ole32" "-l setupapi" "-l imm32" "-l version" "-l oleaut32" "-l uuid" "-l mfplat"
 # -l winmm -l ole32 -l setupapi -l imm32 -l version -l oleaut32 -l uuid -l mfplat
 
 # ohhh so i CANT use spaces here
-if [ -f "./src/plainIMG_rc.o" ]; then
-  gcc -o "${appName}.exe" src/plainIMG_rc.o  src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+if $static; then
+  if [ -f "./src/plainIMG_rc.o" ]; then
+    gcc -o "${appName}-standalone.exe" src/plainIMG_rc.o  src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+  else
+    gcc -o "${appName}-standalone.exe" src/main.c -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+  fi
 else
-  gcc -o "${appName}.exe" src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+  if [ -f "./src/plainIMG_rc.o" ]; then
+    gcc -o "${appName}.exe" src/plainIMG_rc.o  src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+  else
+    gcc -o "${appName}.exe" src/main.c -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 "${args[@]}"
+  fi
 fi
 
 if $autorun; then
