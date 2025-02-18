@@ -254,26 +254,18 @@ SDL_Texture* createTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surfa
     return texture;
 }*/
 
-// https://stackoverflow.com/questions/11865269/win32-resource-file-loading-into-memory
-// https://stackoverflow.com/questions/20584045/win32-application-hbitmap-loadimage-fails-to-load-anything
-// https://stackoverflow.com/questions/32880911/win32-loadbitmap-returns-error-1814
 SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
-    //SDL_Log("hInstance loadRcBitmapAsTexture");
-    //HINSTANCE hInstance = GetModuleHandle(NULL);
-    //RETURN_IF_NULL(hInstance);
-    //https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew
-    //https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes
-    //https://learn.microsoft.com/en-us/windows/win32/menurc/finding-and-loading-resources
-    //https://learn.microsoft.com/en-us/windows/win32/menurc/resource-definition-statements?redirectedfrom=MSDN
-    //https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagew
+    // OH MY GOD. THE BMP WASNT THE CORRECT FORMAT.
+    // IT NEEDED TO BE 24 BIT COLOR INSTEAD OF THE "Windows 98/2000 and newer format"
+    // I HATE CONVERTIO!!!!!!!!!!! IT CONVERTED PNG TO BMP WRONGLY
+    // (oh wait, it included alpha channel for me. looks like i shouldve just knew this beforehand...)
 
     SDL_Log("hBitmap loadRcBitmapAsTexture");
-    //HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, 0); // LR_CREATEDIBSECTION
-    //HBITMAP hBitmap = (HBITMAP)LoadBitmap(hInstance, MAKEINTRESOURCE(resourceId));
+    // LR_CREATEDIBSECTION is not needed here. its only needed for alpha channel images which ARENT SUPPORTED HERE grrr
     HBITMAP hBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
 
-    // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. hmmm...
-    // now it has error 5, which means there is no access to something. hmmm...
+    // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. solution: make sure that numeric ids match both in c files and in resource rc files.
+    // now it has error 5, which means there is no access to something. solution: make sure that your bitmap is 24bit format (without alpha channel). you can check this with "file" command.
     if (hBitmap == NULL) {
         SDL_Log("hBitmap loadRcBitmapAsTexture error %d", GetLastError());
         DeleteObject(hBitmap);
@@ -281,24 +273,25 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     }
     //RETURN_IF_NULL(hBitmap);
 
+    // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmap
     SDL_Log("bitmap loadRcBitmapAsTexture");
     BITMAP bitmap;
-    GetObject(hBitmap, sizeof(BITMAP), &hBitmap);
-    if (&bitmap == NULL) {
+    if (GetObject(hBitmap, sizeof(BITMAP), &hBitmap) == 0) {
         SDL_Log("bitmap loadRcBitmapAsTexture error %d", GetLastError());
         DeleteObject(hBitmap);
         return NULL;
     }
     //RETURN_IF_NULL(&bitmap);
 
-    SDL_Log("surface loadRcBitmapAsTexture");
+    //int pitch = ((int)bitmap.bmWidthBytes) - 1;
+    int pitch = bitmap.bmWidth * (bitmap.bmBitsPixel / 8);
+    SDL_Log("surface loadRcBitmapAsTexture %d", pitch);
     SDL_Surface* surface = SDL_CreateSurfaceFrom(
-        bitmap.bmWidth,
-        bitmap.bmHeight,
+        (int)bitmap.bmWidth,
+        (int)bitmap.bmHeight,
         SDL_PIXELFORMAT_BGR24,
-        bitmap.bmBits,
-        bitmap.bmWidthBytes
-        //bitmap.bmBitsPixel
+        (void*)bitmap.bmBits,
+        pitch
     );
     DeleteObject(hBitmap);
     RETURN_IF_NULL(surface);
