@@ -257,6 +257,9 @@ SDL_Texture* createTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surfa
     return texture;
 }*/
 
+// https://stackoverflow.com/questions/11865269/win32-resource-file-loading-into-memory
+// https://stackoverflow.com/questions/20584045/win32-application-hbitmap-loadimage-fails-to-load-anything
+// https://stackoverflow.com/questions/32880911/win32-loadbitmap-returns-error-1814
 SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     SDL_Log("hInstance loadRcBitmapAsTexture");
     HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -264,6 +267,8 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
 
     SDL_Log("hBitmap loadRcBitmapAsTexture");
     HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+    // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. hmmm...
+    SDL_Log("hBitmap loadRcBitmapAsTexture error %d", GetLastError());
     RETURN_IF_NULL(hBitmap);
 
     SDL_Log("bitmap loadRcBitmapAsTexture");
