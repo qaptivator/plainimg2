@@ -57,7 +57,7 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 
 - SDL3 is included inside this repository, so just clone this repository
 - you need vs c/c++ redistributable and gcc installed
-- run `./build.sh`, and it will build everything for you with gcc. run with `./plainIMG.exe` (or `./build.sh && ./plainIMG.exe` for short)
+- run `./build.sh`, and it will build everything for you with gcc inside `build/debug`. run with `./build/debug/plainIMG.exe` (or `./build.sh -a` for short)
 - if youre not statically building with `-s`, you NEED to have `SDL3.dll` and `SDL3_image.dll` located in the same directory as the executable.
 - build the resoures (icon + welcome text) with `windres src/plainIMG.rc -O coff -o src/plainIMG_rc.o`
 
@@ -70,6 +70,8 @@ then, just copy over generated `.a` files to `lib/` folder of each library.
 for SDL3_image, there is a special case. copy over the entire SDL folder, where you just built it inside `build/`,  
 then run SDL3_image build with `cmake .. -DBUILD-SHARED-LIBS=OFF`, then do `cmake --build .`.
 you would also need to use `git submodule update --init --recursive` in SDL image.
+
+you need inno setup installed to build for release. to build for release, run `./release.sh <version>`. it will create `build/release`. then, after you made sure that all of the artifacts work, tag the release with `./tag_release.sh <version>`. push it with `git push origin tag <version>`, and then make your release in github. the versions should be in the format of "vX.X.X".
 
 # todo list
 

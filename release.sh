@@ -1,8 +1,7 @@
-VERSION=${1:-"v1.0.0"}
+VERSION=$1
 
-# Tag the current commit
-git tag -a "$VERSION" -m "Release $VERSION"
-git push origin "$VERSION"
+./build.sh -r
+./build.sh -s -r
 
 # Create build output directory
 OUTPUT_DIR="release-$VERSION"
