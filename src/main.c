@@ -13,15 +13,16 @@
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
 
-#define WELCOME_WHITE_PATH "welcome_white.png"
-#define WELCOME_BLACK_PATH "welcome_black.png"
+// USE THE SAME NUMBERS IN plainIMG.rc!!!!
+#define WELCOME_WHITE_PATH 5
+#define WELCOME_BLACK_PATH 6
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
-#define RETURN_IF_NULL(var)  \
-    do {                  \
-        if ((var) == NULL) { \  
-            return NULL;   \
-        }                 \
+#define RETURN_IF_NULL(var)\
+    do {\
+        if ((var) == NULL) {\  
+            return NULL;\
+        }\
     } while(0)
 
 
@@ -256,7 +257,7 @@ SDL_Texture* createTextureFromSurface(SDL_Renderer* renderer, SDL_Surface* surfa
     return texture;
 }*/
 
-SDL_Texture* loadRcBitmapAsTexture(struct AppState *state, int resourceId) {
+SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     HINSTANCE hInstance = GetModuleHandle(NULL);
     RETURN_IF_NULL(hInstance);
 
@@ -267,18 +268,19 @@ SDL_Texture* loadRcBitmapAsTexture(struct AppState *state, int resourceId) {
     GetObject(hBitmap, sizeof(BITMAP), &hBitmap);
     RETURN_IF_NULL(&bitmap);
 
-    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(
-        bitmap.bmBits,
+    SDL_Surface* surface = SDL_CreateSurfaceFrom(
         bitmap.bmWidth,
         bitmap.bmHeight,
-        bitmap.bmBitsPixel,
-        bitmap.bmWidthBytes,
-        SDL_PIXELFORMAT_BGR24
+        SDL_PIXELFORMAT_BGR24,
+        bitmap.bmBits,
+        //bitmap.bmBitsPixel,
+        bitmap.bmWidthBytes
+        //bitmap.bmBits,
     );
     RETURN_IF_NULL(surface);
 
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(state->renderer, surface);
-    SDL_FreeSurface(surface);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_DestroySurface(surface);
     RETURN_IF_NULL(texture);
 
     return texture;
@@ -476,14 +478,14 @@ int main(int argc, char* argv[]) {
     // i can also just color a single white image, but im lazy, so i will have both for both light and dark mode
     //state.welcomeWhite = IMG_LoadTexture(state.renderer, WELCOME_WHITE_PATH);
 
-    state.welcomeWhite = loadRcBitmapAsTexture(&state, WELCOME_WHITE_PATH);
+    state.welcomeWhite = loadRcBitmapAsTexture(state.renderer, WELCOME_WHITE_PATH);
     if (state.welcomeWhite == NULL) {
-        SDL_Log("IMG_LoadTexture welcomeWhite error: %s", SDL_GetError());
+        SDL_Log("loadRcBitmapAsTexture welcomeWhite error: %s", SDL_GetError());
         return -3;
     }
-    state.welcomeBlack = loadRcBitmapAsTexture(&state, WELCOME_BLACK_PATH);
+    state.welcomeBlack = loadRcBitmapAsTexture(state.renderer, WELCOME_BLACK_PATH);
     if (state.welcomeBlack == NULL) {
-        SDL_Log("IMG_LoadTexture welcomeBlack error: %s", SDL_GetError());
+        SDL_Log("loadRcBitmapAsTexture welcomeBlack error: %s", SDL_GetError());
         return -4;
     }
 
