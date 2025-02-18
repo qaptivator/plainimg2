@@ -266,16 +266,27 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
     RETURN_IF_NULL(hInstance);
 
     SDL_Log("hBitmap loadRcBitmapAsTexture");
-    HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION);
+    //HBITMAP hBitmap = (HBITMAP)LoadImage(hInstance, MAKEINTRESOURCE(resourceId), IMAGE_BITMAP, 0, 0, 0); // LR_CREATEDIBSECTION
+    HBITMAP hBitmap = (HBITMAP)LoadBitmap(hInstance, MAKEINTRESOURCE(resourceId));
+
     // here it returns error 1814, ERROR_RESOURCE_NAME_NOT_FOUND. hmmm...
     // now it has error 5, which means there is no access to something. hmmm...
-    SDL_Log("hBitmap loadRcBitmapAsTexture error %d", GetLastError());
-    RETURN_IF_NULL(hBitmap);
+    if (hBitmap == NULL) {
+        SDL_Log("hBitmap loadRcBitmapAsTexture error %d", GetLastError());
+        DeleteObject(hBitmap);
+        return NULL;
+    }
+    //RETURN_IF_NULL(hBitmap);
 
     SDL_Log("bitmap loadRcBitmapAsTexture");
     BITMAP bitmap;
     GetObject(hBitmap, sizeof(BITMAP), &hBitmap);
-    RETURN_IF_NULL(&bitmap);
+    if (&bitmap == NULL) {
+        SDL_Log("bitmap loadRcBitmapAsTexture error %d", GetLastError());
+        DeleteObject(hBitmap);
+        return NULL;
+    }
+    //RETURN_IF_NULL(&bitmap);
 
     SDL_Log("surface loadRcBitmapAsTexture");
     SDL_Surface* surface = SDL_CreateSurfaceFrom(
@@ -286,6 +297,7 @@ SDL_Texture* loadRcBitmapAsTexture(SDL_Renderer *renderer, int resourceId) {
         bitmap.bmWidthBytes
         //bitmap.bmBitsPixel
     );
+    DeleteObject(hBitmap);
     RETURN_IF_NULL(surface);
 
     SDL_Log("texture loadRcBitmapAsTexture");
