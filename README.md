@@ -71,7 +71,7 @@ for SDL3_image, there is a special case. copy over the entire SDL folder, where 
 then run SDL3_image build with `cmake .. -DBUILD-SHARED-LIBS=OFF`, then do `cmake --build .`.
 you would also need to use `git submodule update --init --recursive` in SDL image.
 
-you need inno setup installed to build for release, and it should be in the PATH. to build for release, run `./release.sh <version>`. it will create `build/release`. then, after you made sure that all of the artifacts work, tag the release with `./tag_release.sh <version>`. push it with `git push origin tag <version>`, and then make your release in github. the versions should be in the format of "vX.X.X".
+you need inno setup installed to build for release, and it should be in the PATH. to build for release, run `./release.sh <version>`. it will create `build/release`. then, after you made sure that all of the artifacts work, tag the release with `./tag_release.sh <version>`. push it with `git push origin tag <version>`, and then make your release in github. the versions should be in the format of "vX.X.X". **BE SURE TO MANUALLY UPDATE THE VERSION NUMBER IN INSTALLER.ISS BEFORE RUNNING RELEASE.SH**
 
 # todo list
 

@@ -74,6 +74,7 @@ void updateUseAntialiasing(struct AppState *state) {
 }
 
 void resizeWindowToImage(struct AppState *state) {
+    drawFrame(state); // recalculate textureRect
     if (state->textureLoaded && state->keepAspectRatio && state->textureRect->w > 0 && state->textureRect->h > 0) {
         SDL_SetWindowSize(state->window, state->textureRect->w, state->textureRect->h);
     }
@@ -135,6 +136,8 @@ void openImage(struct AppState *state, const char *path) {
 
     state->texture = newTexture;
     state->textureLoaded = true;
+
+    resizeWindowToImage(state);
 }
 
 void openImageWithDialog(struct AppState *state) {
