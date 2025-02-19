@@ -36,6 +36,7 @@ struct AppState {
     //char *imagePath;
     bool textureLoaded;
     bool quitApp;
+    bool needRedraw;
 
     bool keepAspectRatio;
     bool useBlackBg;
@@ -142,6 +143,8 @@ HWND getHwndFromWindow(SDL_Window *window) {
 
 // unfortunately this function is windows-only now womp womp
 void openImage(struct AppState *state, const char *path) {
+    state->needRedraw = true;
+
     if (path == NULL) {
         state->textureLoaded = false;
         return;
@@ -288,6 +291,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
             break;
     }
 
+    state->needRedraw = true;
     DestroyMenu(hMenu);
 }
 
@@ -383,6 +387,7 @@ HWND getHwndFromWindow(SDL_Window *window) {}
 #endif
 
 void drawFrame(struct AppState *state) {
+    SDL_Log("draw");
     int _bgColor = state->useBlackBg ? 0 : 0xff;
     SDL_SetRenderDrawColor(state->renderer, _bgColor, _bgColor, _bgColor, 0xff);
     SDL_RenderClear(state->renderer);
@@ -410,6 +415,11 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
     switch (event->type) {
         case SDL_EVENT_QUIT:
             state->quitApp = true;
+            break;
+
+        case SDL_EVENT_WINDOW_EXPOSED:
+        case SDL_EVENT_WINDOW_RESIZED:
+            state->needRedraw = true;
             break;
 
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
@@ -455,10 +465,12 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
 
                 case SDLK_A:
                     state->keepAspectRatio = !state->keepAspectRatio;
+                    state->needRedraw = true;
                     break;
 
                 case SDLK_B:
                     state->useBlackBg = !state->useBlackBg;
+                    state->needRedraw = true;
                     break;
 
                 case SDLK_T:
@@ -469,6 +481,7 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
                 case SDLK_L:
                     state->useAntialiasing = !state->useAntialiasing;
                     updateUseAntialiasing(state);
+                    state->needRedraw = true;
                     break;
 
                 case SDLK_R:
@@ -512,6 +525,7 @@ int main(int argc, char* argv[]) {
     state.alwaysOnTop = true;
     state.useAntialiasing = true;
     state.quitApp = false;
+    state.needRedraw = false;
     state.dragging = false;
     state.dragX = 0;
     state.dragY = 0;
@@ -568,12 +582,16 @@ int main(int argc, char* argv[]) {
         openImage(&state, argv[1]);
     }
 
+    state.needRedraw = true;
     SDL_Event event;
     while (!state.quitApp) {
-        while (SDL_PollEvent(&event)) {
+        if (SDL_WaitEvent(&event)) {
             handleEvent(&state, &event);
         }
-        drawFrame(&state);
+        if (state.needRedraw) {
+            drawFrame(&state);
+            state.needRedraw = false;
+        }
     }
 
     // ----- QUIT -----
