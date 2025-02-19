@@ -37,6 +37,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 - the link to this github repository is located inside the `About` menu.
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
 - note: when you click the "Set plainIMG as the default image viewer" option in the installer, it automatically sets plainIMG as default for: .jpg, .jpeg, .png and .bmp; if you want to extend this list, update file extension defaults yourself in windows settings.
+- TIFF, AVIF and WEBP are not supported.
 
 # screenshots
 

@@ -165,6 +165,20 @@ void openImage(struct AppState *state, const char *path) {
         SDL_CloseIO(stream);
         return;
     }
+    if (IMG_isTIF(stream)) {
+        SDL_Log("TIFF is not supported in plainIMG. Eiether convert it to a different image format, or select another image.");
+        MessageBox(hwnd, TEXT("TIFF is not supported in plainIMG. Eiether convert it to a different image format, or select another image."), TEXT("plainIMG Error"), MB_OK | MB_ICONERROR);
+        state->textureLoaded = false;
+        SDL_CloseIO(stream);
+        return;
+    }
+    if (IMG_isAVIF(stream)) {
+        SDL_Log("AVIF is not supported in plainIMG. Eiether convert it to a different image format, or select another image.");
+        MessageBox(hwnd, TEXT("AVIF is not supported in plainIMG. Eiether convert it to a different image format, or select another image."), TEXT("plainIMG Error"), MB_OK | MB_ICONERROR);
+        state->textureLoaded = false;
+        SDL_CloseIO(stream);
+        return;
+    }
 
     // the last option automatically closes the stream
     SDL_Texture *newTexture = IMG_LoadTexture_IO(state->renderer, stream, true);
