@@ -94,8 +94,9 @@ you need inno setup installed to build for release, and it should be in the PATH
 - [ ] add a reminder when there is a new version of this app
 - [ ] finish up lite mode
 - [x] add icon to the executable with windres
-- [ ] build this exe statically (basically you need to have .a's instead of .dll's) (SDL3_image doesnt want to build statically wth)
+- [x] build this exe statically (basically you need to have .a's instead of .dll's)
 - [ ] make a lite mode where the title bar will be hidden, so you will be able to see just the picture
 - [ ] make proper version control (possibly with an auto-updater)
 - [x] make an inno setup installer
 - [ ] fix the client area dragging being a bit choppy
+- [x] add a global VERSION.txt file which will be used everywhere (main.c, installer.iss, tag_release.sh etc)

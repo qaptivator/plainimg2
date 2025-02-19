@@ -4,6 +4,8 @@ yesconsole=false
 static=false
 release=false
 
+plainimg_version=$(cat VERSION.txt)
+
 while getopts "hrays" OPTION; do
   case $OPTION in
     a) autorun=true ;;
@@ -42,12 +44,12 @@ if ! $release; then
 
   # ohhh so i cant use spaces here
   if $static; then
-    gcc -m64 src/main.c src/${appName}_rc.res -o "build/debug/${appName}_static.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+    gcc -m64 -DPLAINIMG_VERSION=\"$plainimg_version\" src/main.c src/${appName}_rc.res -o "build/debug/${appName}_static.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
     if $autorun; then
       "./build/debug/${appName}_static.exe"
     fi
   else
-    gcc -m64 src/main.c src/${appName}_rc.res -o "build/debug/${appName}.exe" -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+    gcc -m64 -DPLAINIMG_VERSION=\"$plainimg_version\" src/main.c src/${appName}_rc.res -o "build/debug/${appName}.exe" -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
     if $autorun; then
       "./build/debug/${appName}.exe"
     fi
@@ -74,17 +76,17 @@ else
     if [ ! -d "build/release/static" ]; then
       mkdir build/release/static
     fi
-    gcc -m64 src/main.c src/${appName}_rc.res -o "build/release/static/${appName}_static.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+    gcc -DPLAINIMG_VERSION=\"$(plainimg_version)\" -m64 src/main.c src/${appName}_rc.res -o "build/release/static/${appName}_static.exe" -static -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
     if $autorun; then
-      "./${appName}_static.exe"
+      "./build/release/static/${appName}_static.exe"
     fi
   else
     if [ ! -d "build/release/dynamic" ]; then
       mkdir build/release/dynamic
     fi
-    gcc -m64 src/main.c src/${appName}_rc.res -o "build/release/dynamic/${appName}.exe" -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
+    gcc -DPLAINIMG_VERSION=\"$(plainimg_version)\" -m64 src/main.c src/${appName}_rc.res -o "build/release/dynamic/${appName}.exe" -I./src/SDL3/include -I./src/SDL3_Image/include -L./src/SDL3/lib -L./src/SDL3_Image/lib -lSDL3 -lSDL3_image -lComdlg32 -lGdi32 "${args[@]}"
     if $autorun; then
-      "./${appName}.exe"
+      "./build/release/dynamic/${appName}.exe"
     fi
   fi
 fi

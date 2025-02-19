@@ -3,6 +3,10 @@
 #include <SDL3_image/SDL_image.h>
 #include "plainIMG_rc.h"
 
+#ifndef PLAINIMG_VERSION
+#define PLAINIMG_VERSION "UNKNOWN"
+#endif
+
 #define W_WIDTH 800
 #define W_HEIGHT 600
 #define WMIN_WIDTH 150
@@ -253,7 +257,12 @@ void showContextMenu(struct AppState *state, int x, int y) {
             updateUseAntialiasing(state);
             break;
         case 8:
-            int _buttonId = MessageBox(hwnd, TEXT("plainIMG. as simple as it gets for an image viewer. made by qaptivator, licensed under MIT. to see the GitHub repository, click 'OK'"), TEXT( "About plainIMG" ), MB_OKCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON2);
+            int _buttonId = MessageBox(
+                hwnd,
+                TEXT("plainIMG v") TEXT(PLAINIMG_VERSION) TEXT(" // as simple as it gets for an image viewer. made by qaptivator, licensed under MIT. to see the GitHub repository, click 'OK'"),
+                TEXT("About plainIMG"), 
+                MB_OKCANCEL | MB_ICONINFORMATION | MB_DEFBUTTON2
+            );
             SDL_Log("_buttonId: %d", _buttonId);
             if (_buttonId == 1) {
                 //system("open https://github.com/qaptivator/plainimg");
