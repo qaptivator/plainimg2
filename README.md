@@ -2,6 +2,15 @@
 
 _///// as simple as it gets for an image viewer /////_
 
+# why would i use this?
+
+1. look at the comparison between plainIMG and Photos (opens images almost twice as fast!):
+
+![plainIMG_open_comparison](examples/plainIMG_open_comparison.gif)
+
+2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!):
+3. lightweight (the executable is only 2MB!)
+
 # usage
 
 - install the installer from the latest release.
@@ -38,10 +47,6 @@ to support the developer, you can appreciate the project by giving it a star in 
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
 - note: when you click the "Set plainIMG as the default image viewer" option in the installer, it automatically sets plainIMG as default for: .jpg, .jpeg, .png and .bmp; if you want to extend this list, update file extension defaults yourself in windows settings.
 - TIFF, AVIF and WEBP are not supported.
-
-# comparison between plainIMG and Photos
-
-![plainIMG_open_comparison](examples/plainIMG_open_comparison.gif)
 
 # screenshots
 
