@@ -195,6 +195,7 @@ void openImage(struct AppState *state, const char *path) {
     state->texture = newTexture;
     state->textureLoaded = true;
 
+    updateUseAntialiasing(state);
     resizeWindowToImage(state);
 }
 
