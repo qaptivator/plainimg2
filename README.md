@@ -114,3 +114,4 @@ mark your release with `./tag_release.sh`. it will automatically push it. **make
 - [ ] add the image basename when an image is opened to the window's title
 - [ ] possibly make an .msi installer
 - [ ] make the app notify you if it couldnt open an app instead of just silencing it
+- [ ] fix the fact that sometimes, when you resize window to image, it just doesnt properly resize, and it keeps on resizing
