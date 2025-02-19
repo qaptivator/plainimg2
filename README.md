@@ -39,6 +39,10 @@ to support the developer, you can appreciate the project by giving it a star in 
 - note: when you click the "Set plainIMG as the default image viewer" option in the installer, it automatically sets plainIMG as default for: .jpg, .jpeg, .png and .bmp; if you want to extend this list, update file extension defaults yourself in windows settings.
 - TIFF, AVIF and WEBP are not supported.
 
+# comparison between plainIMG and Photos
+
+![plainIMG_open_comparison](examples/plainIMG_open_comparison.gif)
+
 # screenshots
 
 ![screenshot1](examples/screenshot1.png)
