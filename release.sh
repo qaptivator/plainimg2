@@ -2,13 +2,14 @@ plainimg_version=$(cat VERSION.txt)
 
 ./build.sh -r
 ./build.sh -s -r
+
+strip --strip-all "build/release/static/plainIMG_static.exe"
+
 iscc installer.iss
 
 if [ ! -d "build/release/upload" ]; then
     mkdir -p build/release/upload
 fi
-
-strip --strip-all "build/release/static/plainIMG_static.exe"
 
 cp "build/release/installer/plainIMG_installer.exe" "build/release/upload/plainIMG_v${plainimg_version}_installer.exe"
 cp "build/release/static/plainIMG_static.exe" "build/release/upload/plainIMG_v${plainimg_version}_onefile.exe"
