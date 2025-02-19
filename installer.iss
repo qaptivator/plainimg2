@@ -17,31 +17,21 @@ ChangesAssociations=yes
 [Files]
 Source: "build\release\static\plainIMG_static.exe"; DestDir: "{app}"; DestName: "plainIMG.exe"; Flags: ignoreversion
 
-[Tasks]
-Name: "assoc"; Description: "Set plainIMG as the default image viewer"; GroupDescription: "Additional icons:"; Flags: unchecked
-
-[Code]
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-  if CurStep = ssPostInstall then
-  begin
-    if IsTaskSelected('assoc') then
-    begin
-      RegWriteStringValue(HKCR, '.jpg', '', 'plainIMG');
-      RegWriteStringValue(HKCR, '.jpeg', '', 'plainIMG');
-      RegWriteStringValue(HKCR, '.png', '', 'plainIMG');
-      RegWriteStringValue(HKCR, 'plainIMG\shell\open\command', '', ExpandConstant('"{app}\plainIMG.exe" "%1"'));
-    end;
-  end;
-end;
-
 [Icons]
 Name: "{group}\plainIMG"; Filename: "{app}\plainIMG.exe"
 Name: "{userdesktop}\plainIMG"; Filename: "{app}\plainIMG.exe"
 
+[Tasks]
+Name: "plainimgAsDefaultAssoc"; Description: "Set plainIMG as the default image viewer"; GroupDescription: "File extensions:"; Flags: unchecked
+
 [Registry]
 Root: HKCR; Subkey: "*\shell\Open with plainIMG"; ValueType: string; ValueName: ""; ValueData: "Open with plainIMG"; Flags: uninsdeletekey
 Root: HKCR; Subkey: "*\shell\Open with plainIMG\command"; ValueType: string; ValueName: ""; ValueData: """{app}\plainIMG.exe"" ""%1"""
+Root: HKCR; Subkey: ".jpg"; ValueType: string; ValueName: ""; ValueData: "plainIMG"; Flags: uninsdeletevalue; Tasks: plainimgAsDefaultAssoc
+Root: HKCR; Subkey: ".jpeg"; ValueType: string; ValueName: ""; ValueData: "plainIMG"; Flags: uninsdeletevalue; Tasks: plainimgAsDefaultAssoc
+Root: HKCR; Subkey: ".png"; ValueType: string; ValueName: ""; ValueData: "plainIMG"; Flags: uninsdeletevalue; Tasks: plainimgAsDefaultAssoc
+Root: HKCR; Subkey: "plainIMG\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\plainIMG.exe"" ""%1"""; Tasks: plainimgAsDefaultAssoc
+; Root: HKCR; Subkey: "plainIMG\shell\open\command"; ValueType: string; ValueName: ""; ValueData: ExpandConstant('"{app}\plainIMG.exe" "%1"'); Flags: uninsdeletekey; Tasks: plainimgAsDefaultAssoc
 
 [Run]
 Filename: "{app}\plainIMG.exe"; Description: "Launch plainIMG"; Flags: nowait postinstall
