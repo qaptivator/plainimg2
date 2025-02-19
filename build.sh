@@ -3,16 +3,18 @@ autorun=false
 yesconsole=false
 static=false
 release=false
+profile=false
 
 plainimg_version=$(cat VERSION.txt)
 
-while getopts "hrays" OPTION; do
+while getopts "hprays" OPTION; do
   case $OPTION in
     a) autorun=true ;;
     y) yesconsole=true ;;
     s) static=true ;;
     r) release=true ;;
-    h) echo -e "\nUsage: $0 [-a] [-y] [-s]\n-a | autorun    | autoruns the built executable\n-y | yesconsole | removes the -mwindows flag from gcc, which is on by default\n-s | static     | adds the -static flag to gcc (builds standalone)" ; exit 1 ;;
+    p) profile=true ;;
+    h) echo -e "\nUsage: $0 [-a] [-y] [-s] [-r] [-p]\n-a | autorun    | autoruns the built executable\n-y | yesconsole | removes the -mwindows flag from gcc, which is on by default\n-s | static     | adds the -static flag to gcc (builds standalone)" ; exit 1 ;;
     \?) echo "Invalid option. See the help menu with '-h'" >&2; exit 1;;
   esac
 done
@@ -20,6 +22,9 @@ done
 args=()
 ! $yesconsole && args+=("-mwindows")
 $static && args+=("-lwinmm" "-lole32" "-lsetupapi" "-limm32" "-lversion" "-loleaut32" "-luuid" "-lmfplat")
+$profile && args+=("-no-pie" "-pg") #-g -pg
+#https://stackoverflow.com/questions/42620074/gprof-produces-empty-output
+# to profile, run "./build.sh -s -p", "cd build/debug", "./plainIMG_static.exe", "gprof plainIMG_static.exe gmon.out > analysis.txt"
 
 windres -i src/plainIMG.rc --input-format=rc -o src/plainIMG_rc.res -O coff
 
