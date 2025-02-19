@@ -124,3 +124,5 @@ mark your release with `./tag_release.sh`. it will automatically push it. **make
 - [ ] possibly make an .msi installer
 - [ ] make the app notify you if it couldnt open an app instead of just silencing it
 - [ ] fix the fact that sometimes, when you resize window to image, it just doesnt properly resize, and it keeps on resizing
+- [x] optimize the app so that it wont rerender every time, even though there are no changes
+- [ ] reduce the cpu usage spike when dragging or resizing the window
