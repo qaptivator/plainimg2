@@ -9,7 +9,7 @@ _///// as simple as it gets for an image viewer /////_
 ![plainIMG_open_comparison](examples/plainIMG_open_comparison.gif)
 
 2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!):
-3. lightweight (the executable is only 2MB!)
+3. lightweight (the executable is under 3MB!)
 
 # usage
 
