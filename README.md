@@ -4,11 +4,14 @@ _///// as simple as it gets for an image viewer /////_
 
 # usage
 
-- install the executable from the latest release (as of now, just clone the repository)
-- run it by using the context menu button in an image (may require you to click "show more")
-  - or by dragging a picture over the executable
+- install the installer from the latest release
+- run it and it'll also add itself to the start menu and context menus (Open with plainIMG)
+- now that it is installed, you can right click over an image, select "Choose another app", "Choose an App on your PC", and find the plainIMG executable at `C:\Users\<your user>\AppData\Local\plainIMG\`, select the executable and click "Always".
+- alternatively, you can go to settings, default apps, and set common image formats to plainIMG.
+- when you are done, you can use plainIMG by using the context menu button in an image
   - or by running the executable and opening the picture with `Right Click > Open Image...` (or just letter `O`)
   - or by running it through the terminal with first argument being the file path
+  - or by dragging a picture over the executable
 
 the main menu is opened with `Right Click`.
 you can close the window with `Right Click > Quit` or just `Q`, or just `ESCAPE`.
@@ -100,3 +103,4 @@ you need inno setup installed to build for release, and it should be in the PATH
 - [x] make an inno setup installer
 - [ ] fix the client area dragging being a bit choppy
 - [x] add a global VERSION.txt file which will be used everywhere (main.c, installer.iss, tag_release.sh etc)
+- [ ] add the image basename when an image is opened to the window's title

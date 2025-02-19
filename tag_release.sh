@@ -1,3 +1,3 @@
-VERSION=$1
+plainimg_version=$(cat VERSION.txt)
 git checkout main
-git tag -a "$VERSION" -m "Release $VERSION"
+git tag -a "v$plainimg_version" -m "Release v$plainimg_version"

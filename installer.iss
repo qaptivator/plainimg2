@@ -1,6 +1,11 @@
+#define VersionFileHandle FileOpen("VERSION.txt")
+#define AppVersionFromTxt FileRead(VersionFileHandle)
+#expr FileClose(VersionFileHandle)
+#undef VersionFileHandle
+
 [Setup]
 AppName=plainIMG
-AppVersion=1.0.0
+AppVersion={#AppVersionFromTxt}
 DefaultDirName={localappdata}\plainIMG
 DefaultGroupName=plainIMG
 OutputDir=build\release\installer
