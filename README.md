@@ -4,11 +4,11 @@ _///// as simple as it gets for an image viewer /////_
 
 # usage
 
-- install the installer from the latest release
-- run it and it'll also add itself to the start menu and context menus (Open with plainIMG)
-- now that it is installed, you can right click over an image, select "Choose another app", "Choose an App on your PC", and find the plainIMG executable at `C:\Users\<your user>\AppData\Local\plainIMG\`, select the executable and click "Always".
+- install the installer from the latest release.
+- run it and it will install the app, and also add plainIMG to start menu. if you click the "Set plainIMG as the default image viewer" option, jpg, jpeg, png and bmp file extensions will be associated with plainIMG.
+- now that it is installed, you can open an image, select plainIMG and click "Always".
 - alternatively, you can go to settings, default apps, and set common image formats to plainIMG.
-- when you are done, you can use plainIMG by using the context menu button in an image
+- when you are done, you can use plainIMG by clicking on the image (or using "Choose an App on your PC")
   - or by running the executable and opening the picture with `Right Click > Open Image...` (or just letter `O`)
   - or by running it through the terminal with first argument being the file path
   - or by dragging a picture over the executable
@@ -36,6 +36,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 - quit the app by closing the window, pressing `Q` or `ESCAPE`.
 - the link to this github repository is located inside the `About` menu.
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
+- note: when you click the "Set plainIMG as the default image viewer" option in the installer, it automatically sets plainIMG as default for: .jpg, .jpeg, .png and .bmp; if you want to extend this list, update file extension defaults yourself in windows settings.
 
 # screenshots
 
@@ -89,7 +90,13 @@ for SDL3_image, there is a special case. copy over the entire SDL folder, where 
 then run SDL3_image build with `cmake .. -DBUILD-SHARED-LIBS=OFF`, then do `cmake --build .`.
 you would also need to use `git submodule update --init --recursive` in SDL image.
 
-you need inno setup installed to build for release, and it should be in the PATH. to build for release, run `./release.sh <version>`. it will create `build/release`. then, after you made sure that all of the artifacts work, tag the release with `./tag_release.sh <version>`. push it with `git push origin tag <version>`, and then make your release in github. the versions should be in the format of "vX.X.X". **BE SURE TO MANUALLY UPDATE THE VERSION NUMBER IN INSTALLER.ISS BEFORE RUNNING RELEASE.SH**
+if you want to make changes, then make your changes in `dev` branch, and sync them to main with `./sync.sh`.  
+when you want to release, switch to `main`.
+
+you need inno setup installed to build for release, and it should be in the PATH.  
+when you want to build a new release, edit `VERSION.txt` with the version format being `vX.X.X`.  
+to build all the things for release, run `./release.sh`. it will create `build/release`, where `build/release/upload` is the things you would need to upload to github release.  
+mark your release with `./tag_release.sh`. it will automatically push it. **make sure that you correctly specify the version, and it's not a duplicate**
 
 # todo list
 
@@ -104,3 +111,4 @@ you need inno setup installed to build for release, and it should be in the PATH
 - [ ] fix the client area dragging being a bit choppy
 - [x] add a global VERSION.txt file which will be used everywhere (main.c, installer.iss, tag_release.sh etc)
 - [ ] add the image basename when an image is opened to the window's title
+- [ ] possibly make an .msi installer
