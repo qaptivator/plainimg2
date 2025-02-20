@@ -21,13 +21,14 @@
 #define SETTINGS_FILE_MESSAGE "zero is false, one is true\norder matters here\nkeepAspectRatio useBlackBg useAntialiasing alwaysOnTop\n"
 
 // TODO: add the image filename to the window's title
-#define WINDOW_TITLE "plainIMG"
-#define WINDOW_TILTE_TOP "plainIMG [TOP]"
+//#define WINDOW_TITLE "plainIMG"
+//#define WINDOW_TILTE_TOP "plainIMG [TOP]"
 
 // WT = Window Title
-#define WT_STATIC "plainIMG"
-#define WT_TOP " [TOP]"
+#define WINDOW_TITLE "plainIMG"
+#define WINDOW_TITLE_TOP " [TOP]"
 
+#define CONCAT(a, b) a b
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
 #define BOOL_TO_INT(cond) ((cond) ? '1' : '0')
 #define RETURN_IF_NULL(var) \
@@ -76,6 +77,20 @@ float minf(float a, float b) {
 
 float maxf(float a, float b) {
     return (a > b) ? a : b;
+}
+
+void stripRange(char *str, int start, int end) {
+    int len = strlen(str);
+    if (start < 0 || end > len || start >= end) return;
+    memmove(&str[start], &str[end], len - end + 1);
+}
+
+void insertStr(char *str, int index, const char *insert, int buf_size) {
+    int len = strlen(str);
+    int ins_len = strlen(insert);
+    if (index < 0 || index > len || len + ins_len >= buf_size) return;
+    memmove(&str[index + ins_len], &str[index], len - index + 1);
+    memcpy(&str[index], insert, ins_len);
 }
 
 void readStateFromFile(struct AppState *state) {
@@ -127,8 +142,31 @@ void writeStateToFile(struct AppState *state) {
     fclose(file);
 }
 
-void updateWindowTitle(struct AppState *state) {
-    //const char *title = SDL_GetWindowTitle(state->window);
+// todo: test this function out in keepAspectRatio SDL_SetWindowAspectRatio
+
+char* getStaticWindowTitle(struct AppState *state) {
+    return state->alwaysOnTop ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP) : WINDOW_TITLE;
+}
+
+void updateWindowTitle(struct AppState *state, const char *imagePath) {
+    const char *staticTitle = getStaticWindowTitle(state);
+    if (state->textureLoaded) {
+        if (imagePath != NULL) {
+            char newTitle[strlen(imagePath) + strlen(staticTitle)];
+            strcpy(newTitle, imagePath);
+            strcat(newTitle, staticTitle);
+            SDL_SetWindowTitle(state->window, newTitle);
+            return;
+        }
+        char *title = SDL_GetWindowTitle(state->window);
+        if (state->alwaysOnTop) {
+
+        } else {
+
+        }
+    } else {
+        SDL_SetWindowTitle(state->window, staticTitle);
+    }
 }
 
 void calculateTextureRect(struct AppState *state) {
@@ -170,7 +208,8 @@ void calculateTextureRect(struct AppState *state) {
 
 void updateAlwaysOnTop(struct AppState *state) {
     SDL_SetWindowAlwaysOnTop(state->window, state->alwaysOnTop);
-    SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TILTE_TOP : WINDOW_TITLE);
+    //updateWindowTitle(state);
+    SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TITLE_TOP : WINDOW_TITLE);
 }
 
 void updateUseAntialiasing(struct AppState *state) {
