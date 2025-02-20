@@ -473,7 +473,7 @@ void drawFrame(struct AppState *state) {
     }
 
     SDL_RenderPresent(state->renderer);
-    SDL_Delay(1);
+    //SDL_Delay(1);
 }
 
 void handleEvent(struct AppState *state, SDL_Event *event) {
@@ -607,7 +607,7 @@ int main(int argc, char* argv[]) {
     }
 
     // window
-    state.window = SDL_CreateWindow("plainIMG", W_WIDTH, W_HEIGHT, SDL_WINDOW_RESIZABLE); // SDL_WINDOW_RESIZABLE or 0
+    state.window = SDL_CreateWindow("plainIMG", W_WIDTH, W_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN); // SDL_WINDOW_RESIZABLE or 0
     if (state.window == NULL) {
         SDL_Log("SDL_CreateWindow error: %s", SDL_GetError());
         return -1;
@@ -621,6 +621,13 @@ int main(int argc, char* argv[]) {
         return -2;
     }
     SDL_SetEventFilter(&eventFilter, &state);
+
+    // set background color to prevent flashing
+    int _bgColor = state.useBlackBg ? 0 : 0xff;
+    SDL_SetRenderDrawColor(state.renderer, _bgColor, _bgColor, _bgColor, 0xff);
+    SDL_RenderClear(state.renderer);
+    SDL_RenderPresent(state.renderer);
+    SDL_ShowWindow(state.window);
 
     // textures
     // i can also just color a single white image, but im lazy, so i will have both for both light and dark mode
