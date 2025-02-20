@@ -148,6 +148,7 @@ char* getStaticWindowTitle(struct AppState *state) {
     return state->alwaysOnTop ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP) : WINDOW_TITLE;
 }
 
+// todo: just allocate the image path normally lol
 void updateWindowTitle(struct AppState *state, const char *imagePath) {
     /*const char *staticTitle = getStaticWindowTitle(state);
     if (state->textureLoaded) {
@@ -223,6 +224,10 @@ void resizeWindowToImage(struct AppState *state) {
     calculateTextureRect(state); // recalculate textureRect
     if (state->textureLoaded && state->keepAspectRatio && state->textureRect->w > 0 && state->textureRect->h > 0) {
         SDL_SetWindowSize(state->window, state->textureRect->w, state->textureRect->h);
+        // todo: add a "keepWindowAspectRatio" option, which will resize your window to image and use SDL_SetWindowAspectRatio
+        //int _windowWidth, _windowHeight;
+        //SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
+        //SDL_SetWindowAspectRatio(state->window, _windowWidth / _windowHeight, _windowWidth / _windowHeight);
     }
 }
 
