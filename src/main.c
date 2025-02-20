@@ -18,15 +18,16 @@
 #define REPO_URL "https://github.com/qaptivator/plainimg2"
 
 #define SETTINGS_FILE_NAME "settings.txt"
-#define SETTINGS_FILE_MESSAGE "zero is false, one is true\norder matters here\nkeepAspectRatio useBlackBg useAntialiasing alwaysOnTop\n"
+#define SETTINGS_FILE_MESSAGE "zero is false, one is true\norder matters here\nkeepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio\n"
 
 // TODO: add the image filename to the window's title
 //#define WINDOW_TITLE "plainIMG"
 //#define WINDOW_TILTE_TOP "plainIMG [TOP]"
 
-// WT = Window Title
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TITLE_TOP " [TOP]"
+#define WINDOW_TITLE_WK " [WK]"
+//#define WINDOW_TITLE_TOP " [TOP]"
 
 #define CONCAT(a, b) a b
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
@@ -54,6 +55,7 @@ struct AppState {
     bool useBlackBg;
     bool useAntialiasing;
     bool alwaysOnTop;
+    bool keepWindowAspectRatio;
 
     bool dragging;
     int dragX, dragY;
@@ -79,7 +81,7 @@ float maxf(float a, float b) {
     return (a > b) ? a : b;
 }
 
-void stripRange(char *str, int start, int end) {
+/*void stripRange(char *str, int start, int end) {
     int len = strlen(str);
     if (start < 0 || end > len || start >= end) return;
     memmove(&str[start], &str[end], len - end + 1);
@@ -91,7 +93,7 @@ void insertStr(char *str, int index, const char *insert, int buf_size) {
     if (index < 0 || index > len || len + ins_len >= buf_size) return;
     memmove(&str[index + ins_len], &str[index], len - index + 1);
     memcpy(&str[index], insert, ins_len);
-}
+}*/
 
 void readStateFromFile(struct AppState *state) {
     FILE *file = fopen(SETTINGS_FILE_NAME, "r");
@@ -117,6 +119,8 @@ void readStateFromFile(struct AppState *state) {
                     state->useAntialiasing = value;
                 case 3:
                     state->alwaysOnTop = value;
+                case 4:
+                    state->keepWindowAspectRatio = value;
             }
             index++;
         }
@@ -138,18 +142,19 @@ void writeStateToFile(struct AppState *state) {
     fputc(BOOL_TO_INT(state->useBlackBg), file);
     fputc(BOOL_TO_INT(state->useAntialiasing), file);
     fputc(BOOL_TO_INT(state->alwaysOnTop), file);
+    fputc(BOOL_TO_INT(state->keepWindowAspectRatio), file);
 
     fclose(file);
 }
 
 // todo: test this function out in keepAspectRatio SDL_SetWindowAspectRatio
 
-char* getStaticWindowTitle(struct AppState *state) {
+/*char* getStaticWindowTitle(struct AppState *state) {
     return state->alwaysOnTop ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP) : WINDOW_TITLE;
-}
+}*/
 
 // todo: just allocate the image path normally lol
-void updateWindowTitle(struct AppState *state, const char *imagePath) {
+/*void updateWindowTitle(struct AppState *state, const char *imagePath) {
     /*const char *staticTitle = getStaticWindowTitle(state);
     if (state->textureLoaded) {
         if (imagePath != NULL) {
@@ -168,7 +173,20 @@ void updateWindowTitle(struct AppState *state, const char *imagePath) {
         }
     } else {
         SDL_SetWindowTitle(state->window, staticTitle);
-    }*/
+    }
+}*/
+
+void updateWindowTitle(struct AppState *state) {
+    // i kind of hate this logic lol
+    SDL_SetWindowTitle(state->window, 
+        state->keepWindowAspectRatio
+            ? state->alwaysOnTop 
+                ? CONCAT(WINDOW_TITLE, CONCAT(WINDOW_TITLE_TOP, WINDOW_TITLE_WK))
+                : CONCAT(WINDOW_TITLE, WINDOW_TITLE_WK)
+            : state->alwaysOnTop 
+                ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP)
+                : WINDOW_TITLE
+    );
 }
 
 void calculateTextureRect(struct AppState *state) {
@@ -211,7 +229,8 @@ void calculateTextureRect(struct AppState *state) {
 void updateAlwaysOnTop(struct AppState *state) {
     SDL_SetWindowAlwaysOnTop(state->window, state->alwaysOnTop);
     //updateWindowTitle(state);
-    SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TITLE_TOP : WINDOW_TITLE);
+    //SDL_SetWindowTitle(state->window, state->alwaysOnTop ? WINDOW_TITLE_TOP : WINDOW_TITLE);
+    updateWindowTitle(state);
 }
 
 void updateUseAntialiasing(struct AppState *state) {
@@ -220,11 +239,30 @@ void updateUseAntialiasing(struct AppState *state) {
     }
 }
 
+void updateKeepWindowAspectRatio(struct AppState *state) {
+    //state->keepWindowAspectRatio = !state->keepWindowAspectRatio;
+    updateWindowTitle(state);
+    if (state->keepWindowAspectRatio) {
+        //state->keepAspectRatio = true;
+        //resizeWindowToImage(state);
+        int _windowWidth, _windowHeight;
+        SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
+        float _ratio = (float)_windowWidth / (float)_windowHeight;
+        SDL_Log("_ratio: %f %d %d", _ratio, _windowWidth, _windowHeight);
+        SDL_SetWindowAspectRatio(state->window, _ratio, _ratio);
+    } else {
+        SDL_SetWindowAspectRatio(state->window, 0, 0);
+    }
+}
+
 void resizeWindowToImage(struct AppState *state) {
     calculateTextureRect(state); // recalculate textureRect
     if (state->textureLoaded && state->keepAspectRatio && state->textureRect->w > 0 && state->textureRect->h > 0) {
+        if (state->keepWindowAspectRatio) {
+            SDL_SetWindowAspectRatio(state->window, 0, 0);
+        }
         SDL_SetWindowSize(state->window, state->textureRect->w, state->textureRect->h);
-        // todo: add a "keepWindowAspectRatio" option, which will resize your window to image and use SDL_SetWindowAspectRatio
+        updateKeepWindowAspectRatio(state);
         //int _windowWidth, _windowHeight;
         //SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
         //SDL_SetWindowAspectRatio(state->window, _windowWidth / _windowHeight, _windowWidth / _windowHeight);
@@ -306,6 +344,7 @@ void openImage(struct AppState *state, const char *path) {
 
     updateUseAntialiasing(state);
     resizeWindowToImage(state);
+    updateKeepWindowAspectRatio(state);
 }
 
 void openImageWithDialog(struct AppState *state) {
@@ -351,6 +390,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
     AppendMenu(hMenu, MF_STRING, 2, "Close Image\tC");
     AppendMenu(hMenu, CHECK_STATE(state->alwaysOnTop), 3, "Window always on top\tT");
     AppendMenu(hMenu, CHECK_STATE(state->keepAspectRatio), 4, "Keep aspect ratio\tA");
+    AppendMenu(hMenu, CHECK_STATE(state->keepWindowAspectRatio), 11, "Keep window aspect ratio\tW");
     AppendMenu(hMenu, MF_STRING, 5, "Resize window to image\tR");
     AppendMenu(hMenu, CHECK_STATE(state->useBlackBg), 6, "Use black background\tB");
     AppendMenu(hMenu, CHECK_STATE(state->useAntialiasing), 7, "Use antialiasing\tL");
@@ -398,6 +438,10 @@ void showContextMenu(struct AppState *state, int x, int y) {
             break;
         case 9:
             state->quitApp = true;
+            break;
+        case 11:
+            state->keepWindowAspectRatio = !state->keepWindowAspectRatio;
+            updateKeepWindowAspectRatio(state);
             break;
     }
 
@@ -497,7 +541,7 @@ HWND getHwndFromWindow(SDL_Window *window) {}
 #endif
 
 void drawFrame(struct AppState *state) {
-    SDL_Log("draw");
+    //SDL_Log("draw");
     int _bgColor = state->useBlackBg ? 0 : 0xff;
     SDL_SetRenderDrawColor(state->renderer, _bgColor, _bgColor, _bgColor, 0xff);
     SDL_RenderClear(state->renderer);
@@ -605,6 +649,11 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
                 case SDLK_O:
                     openImageWithDialog(state);
                     break;
+
+                case SDLK_W:
+                    state->keepWindowAspectRatio = !state->keepWindowAspectRatio;
+                    updateKeepWindowAspectRatio(state);
+                    break;
             }
             break;
     }
@@ -639,6 +688,7 @@ int main(int argc, char* argv[]) {
     state.dragging = false;
     state.dragX = 0;
     state.dragY = 0;
+    state.keepWindowAspectRatio = false;
     readStateFromFile(&state);
 
     SDL_FRect _textureRect;
@@ -692,6 +742,7 @@ int main(int argc, char* argv[]) {
     // other
     updateAlwaysOnTop(&state);
     updateUseAntialiasing(&state);
+    updateKeepWindowAspectRatio(&state);
     // SDL_Log("SDL3 initialized");
 
     // ----- MAIN -----
