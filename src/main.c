@@ -149,7 +149,7 @@ char* getStaticWindowTitle(struct AppState *state) {
 }
 
 void updateWindowTitle(struct AppState *state, const char *imagePath) {
-    const char *staticTitle = getStaticWindowTitle(state);
+    /*const char *staticTitle = getStaticWindowTitle(state);
     if (state->textureLoaded) {
         if (imagePath != NULL) {
             char newTitle[strlen(imagePath) + strlen(staticTitle)];
@@ -157,16 +157,17 @@ void updateWindowTitle(struct AppState *state, const char *imagePath) {
             strcat(newTitle, staticTitle);
             SDL_SetWindowTitle(state->window, newTitle);
             return;
-        }
-        char *title = SDL_GetWindowTitle(state->window);
-        if (state->alwaysOnTop) {
-
         } else {
+            char *title = SDL_GetWindowTitle(state->window);
+            if (state->alwaysOnTop) {
 
+            } else {
+
+            }
         }
     } else {
         SDL_SetWindowTitle(state->window, staticTitle);
-    }
+    }*/
 }
 
 void calculateTextureRect(struct AppState *state) {
