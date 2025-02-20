@@ -248,7 +248,7 @@ void updateKeepWindowAspectRatio(struct AppState *state) {
         int _windowWidth, _windowHeight;
         SDL_GetWindowSize(state->window, &_windowWidth, &_windowHeight);
         float _ratio = (float)_windowWidth / (float)_windowHeight;
-        SDL_Log("_ratio: %f %d %d", _ratio, _windowWidth, _windowHeight);
+        //SDL_Log("_ratio: %f %d %d", _ratio, _windowWidth, _windowHeight);
         SDL_SetWindowAspectRatio(state->window, _ratio, _ratio);
     } else {
         SDL_SetWindowAspectRatio(state->window, 0, 0);
