@@ -2,6 +2,8 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
 #include <stdio.h>
+#include <libgen.h>
+#include <string.h>
 #include "plainIMG_rc.h"
 
 #ifndef PLAINIMG_VERSION
@@ -21,6 +23,10 @@
 // TODO: add the image filename to the window's title
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
+
+// WT = Window Title
+#define WT_STATIC "plainIMG"
+#define WT_TOP " [TOP]"
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
 #define BOOL_TO_INT(cond) ((cond) ? '1' : '0')
@@ -119,6 +125,10 @@ void writeStateToFile(struct AppState *state) {
     fputc(BOOL_TO_INT(state->alwaysOnTop), file);
 
     fclose(file);
+}
+
+void updateWindowTitle(struct AppState *state) {
+    //const char *title = SDL_GetWindowTitle(state->window);
 }
 
 void calculateTextureRect(struct AppState *state) {
