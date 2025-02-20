@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <SDL3_image/SDL_image.h>
+#include <stdio.h>
 #include "plainIMG_rc.h"
 
 #ifndef PLAINIMG_VERSION
@@ -14,11 +15,15 @@
 #define MAX_PATH 1000
 #define REPO_URL "https://github.com/qaptivator/plainimg2"
 
+#define SETTINGS_FILE_NAME "settings.txt"
+#define SETTINGS_FILE_MESSAGE "zero is false, one is true\norder matters here\nkeepAspectRatio useBlackBg useAntialiasing alwaysOnTop\n"
+
 // TODO: add the image filename to the window's title
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TILTE_TOP "plainIMG [TOP]"
 
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
+#define BOOL_TO_INT(cond) ((cond) ? '1' : '0')
 #define RETURN_IF_NULL(var) \
     do {                    \
         if ((var) == NULL) {\
@@ -40,8 +45,8 @@ struct AppState {
 
     bool keepAspectRatio;
     bool useBlackBg;
-    bool alwaysOnTop;
     bool useAntialiasing;
+    bool alwaysOnTop;
 
     bool dragging;
     int dragX, dragY;
@@ -65,6 +70,55 @@ float minf(float a, float b) {
 
 float maxf(float a, float b) {
     return (a > b) ? a : b;
+}
+
+void readStateFromFile(struct AppState *state) {
+    FILE *file = fopen(SETTINGS_FILE_NAME, "r");
+    if (!file) {
+        //SDL_Log("Couldn't open settings.txt for reading! Going back to default settings.");
+        return;
+    }
+
+    int ch;
+    int index = 0;
+    bool value = false;
+
+    // ORDER: keepAspectRatio useBlackBg useAntialiasing alwaysOnTop
+    while ((ch = fgetc(file)) != EOF) {
+        if (ch == '0' || ch == '1') {
+            value = ch == '1';
+            switch (index) {
+                case 0:
+                    state->keepAspectRatio = value;
+                case 1:
+                    state->useBlackBg = value;
+                case 2:
+                    state->useAntialiasing = value;
+                case 3:
+                    state->alwaysOnTop = value;
+            }
+            index++;
+        }
+    }
+
+    fclose(file);
+}
+
+void writeStateToFile(struct AppState *state) {
+    FILE *file = fopen(SETTINGS_FILE_NAME, "w");
+    if (!file) {
+        //SDL_Log("Couldn't open settings.txt for writing! Failed saving your settings.");
+        return;
+    }
+
+    // ORDER: keepAspectRatio useBlackBg useAntialiasing alwaysOnTop
+    fprintf(file, SETTINGS_FILE_MESSAGE);
+    fputc(BOOL_TO_INT(state->keepAspectRatio), file);
+    fputc(BOOL_TO_INT(state->useBlackBg), file);
+    fputc(BOOL_TO_INT(state->useAntialiasing), file);
+    fputc(BOOL_TO_INT(state->alwaysOnTop), file);
+
+    fclose(file);
 }
 
 void calculateTextureRect(struct AppState *state) {
@@ -530,6 +584,7 @@ int main(int argc, char* argv[]) {
     state.dragging = false;
     state.dragX = 0;
     state.dragY = 0;
+    readStateFromFile(&state);
 
     SDL_FRect _textureRect;
     state.textureRect = &_textureRect;
@@ -598,6 +653,7 @@ int main(int argc, char* argv[]) {
     // ----- QUIT -----
 
     // SDL_Log("SDL3 shutdown");
+    writeStateToFile(&state);
     SDL_DestroyTexture(state.texture);
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
