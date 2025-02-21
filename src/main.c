@@ -127,7 +127,6 @@ void readStateFromFile(struct AppState *state) {
                     state->keepWindowAspectRatio = value;
                     break;
                 case 5:
-                    SDL_Log("showImageName readStateFromFile bool: %i", value);
                     state->showImageName         = value;
                     break;
             }
@@ -135,6 +134,11 @@ void readStateFromFile(struct AppState *state) {
         }
     }
 
+    SDL_Log("Opened settings...");
+    SDL_Log("keepAspectRatio: %d, useBlackBg: %d, useAntialiasing: %d, alwaysOnTop: %d, keepWindowAspectRatio: %d, showImageName: %d",
+    state->keepAspectRatio, state->useBlackBg, state->useAntialiasing, state->alwaysOnTop, state->keepWindowAspectRatio, state->showImageName);
+
+    fflush(file);
     fclose(file);
 }
 
@@ -146,7 +150,10 @@ void writeStateToFile(struct AppState *state) {
         return;
     }
 
-    SDL_Log("alwaysOnTop writeStateToFile bool: %i", state->alwaysOnTop);
+    SDL_Log("Saving settings...");
+    SDL_Log("keepAspectRatio: %d, useBlackBg: %d, useAntialiasing: %d, alwaysOnTop: %d, keepWindowAspectRatio: %d, showImageName: %d",
+    state->keepAspectRatio, state->useBlackBg, state->useAntialiasing, state->alwaysOnTop, state->keepWindowAspectRatio, state->showImageName);
+
     fprintf(file, SETTINGS_FILE_MESSAGE);
     fputc(BOOL_TO_INT(state->keepAspectRatio       ), file);
     fputc(BOOL_TO_INT(state->useBlackBg            ), file);
@@ -213,7 +220,7 @@ void updateWindowTitle(struct AppState *state) {
     fullText[0] = '\0';
 
     strcat(fullText, staticText);
-    if (state->textureLoaded && state->showImageName) {
+    if (state->textureLoaded && state->showImageName && state->imageName->size > 1) {
         strcat(fullText, " \"");
         strcat(fullText, PS_Get(state->imageName));
         strcat(fullText, "\"");
@@ -822,15 +829,17 @@ int main(int argc, char* argv[]) {
 
     // ----- QUIT -----
 
+    writeStateToFile(&state);
+
     //SDL_Log("SDL3 quit");
     PS_Free(state.imageName);
     SDL_DestroyTexture(state.texture);
+    SDL_DestroyTexture(state.welcomeWhite);
+    SDL_DestroyTexture(state.welcomeBlack);
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
     // IMG_Quit();
     SDL_Quit();
-
-    writeStateToFile(&state);
 
     return 0;
 }
