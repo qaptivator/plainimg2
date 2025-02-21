@@ -113,17 +113,23 @@ void readStateFromFile(struct AppState *state) {
                 // I COMPLETELY FORGOT BREAK STATEMENTS LOL
                 case 0:
                     state->keepAspectRatio       = value;
+                    break;
                 case 1:
                     state->useBlackBg            = value;
+                    break;
                 case 2:
                     state->useAntialiasing       = value;
+                    break;
                 case 3:
                     state->alwaysOnTop           = value;
+                    break;
                 case 4:
                     state->keepWindowAspectRatio = value;
+                    break;
                 case 5:
                     SDL_Log("showImageName readStateFromFile bool: %i", value);
                     state->showImageName         = value;
+                    break;
             }
             index++;
         }
@@ -132,13 +138,15 @@ void readStateFromFile(struct AppState *state) {
     fclose(file);
 }
 
+// todo: when i run app, do changes to state, then quit, it saves fine. but if i run app, OPEN IMAGE, do changes to state, then quit, IT DOESNT SAVE TO FILE.
 void writeStateToFile(struct AppState *state) {
     FILE *file = fopen(SETTINGS_FILE_NAME, "w");
-    if (!file) {
+    if (file == NULL) {
         SDL_Log("Couldn't open settings.txt for writing! Failed saving your settings.");
         return;
     }
 
+    SDL_Log("alwaysOnTop writeStateToFile bool: %i", state->alwaysOnTop);
     fprintf(file, SETTINGS_FILE_MESSAGE);
     fputc(BOOL_TO_INT(state->keepAspectRatio       ), file);
     fputc(BOOL_TO_INT(state->useBlackBg            ), file);
@@ -146,9 +154,10 @@ void writeStateToFile(struct AppState *state) {
     fputc(BOOL_TO_INT(state->alwaysOnTop           ), file);
     fputc(BOOL_TO_INT(state->keepWindowAspectRatio ), file);
     fputc(BOOL_TO_INT(state->showImageName         ), file);
-    SDL_Log("showImageName writeStateToFile bool: %i", state->showImageName);
-    SDL_Log("showImageName writeStateToFile: %c", BOOL_TO_INT(state->showImageName));
+    //SDL_Log("showImageName writeStateToFile bool: %i", state->showImageName);
+    //SDL_Log("showImageName writeStateToFile: %c", BOOL_TO_INT(state->showImageName));
 
+    //fflush(file);
     fclose(file);
 }
 
@@ -813,13 +822,15 @@ int main(int argc, char* argv[]) {
 
     // ----- QUIT -----
 
-    // SDL_Log("SDL3 shutdown");
-    writeStateToFile(&state);
+    //SDL_Log("SDL3 quit");
+    PS_Free(state.imageName);
     SDL_DestroyTexture(state.texture);
     SDL_DestroyRenderer(state.renderer);
     SDL_DestroyWindow(state.window);
     // IMG_Quit();
     SDL_Quit();
+
+    writeStateToFile(&state);
 
     return 0;
 }
