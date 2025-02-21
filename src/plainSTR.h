@@ -1,106 +1,65 @@
 // plainSTR.h
-// a header string library for C, with dynamic string allocation, without null terminators
+// a header string library for C with dynamic string allocation
+// todo: remove null terminators grrr
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct PS_String {
-    int length;
+typedef struct {
     char *data;
-};
+    size_t size;
+} PS_String;
 
-PS_String* PS_Create(const char *input) {
-    if (!input) return NULL;
-
+PS_String* PS_Create(size_t initial_size) {
     PS_String *str = (PS_String*)malloc(sizeof(PS_String));
-    if (!str) return NULL;
-    
-    str->length = strlen(input);
-    str->data = (char*)malloc(str->length * sizeof(char));
-    if (!str->data) {
-        free(str);
-        return NULL;
+    if (str != NULL) {
+        str->data = (char*)malloc(initial_size);
+        if (str->data != NULL) {
+            str->size = initial_size;
+            str->data[0] = '\0';
+        } else {
+            free(str);
+            return NULL;
+        }
     }
-    
-    memcpy(str->data, input, str->length);
     return str;
 }
 
-void PS_Free(PS_String *str) {
-    if (str) {
-        if (str->data) {
-            free(str->data);
+void PS_Set(PS_String *dest, const char *new_str) {
+    size_t new_len = strlen(new_str) + 1;
+    if (new_len > dest->size) {
+        dest->data = (char*)realloc(dest->data, new_len);
+        if (dest->data == NULL) {
+            dest->size = 0;
+            return;
         }
-        free(str);
+        dest->size = new_len;
     }
+    strcpy(dest->data, new_str);
 }
 
-/*char* PS_ToChars(PS_String *str) {
-    if (!str || !str->data) return NULL;
-
-    char *nullTerminated = (char*)malloc((str->length + 1) * sizeof(char));
-    if (!nullTerminated) return NULL;
-    
-    memcpy(nullTerminated, str->data, str->length);
-    nullTerminated[str->length] = '\0';
-    return nullTerminated;
-}*/
-
-char* PS_ToChars(PS_String *str) {
-    if (!str || !str->data) return NULL;
-
-    char *nullTerminated = (char*)malloc((str->length + 1) * sizeof(char));
-    if (!nullTerminated) return NULL;
-    
-    memcpy(nullTerminated, str->data, str->length);
-    nullTerminated[str->length] = '\0';
-    return nullTerminated;
+const char* PS_Get(const PS_String *str) {
+    return str->data;
 }
 
-void PS_Copy(PS_String *dest, PS_String *src) {
-    if (!dest || !src || !src->data) return;
-
-    dest->length = src->length;
-    dest->data = (char*)realloc(dest->data, dest->length * sizeof(char));
-    if (!dest->data) return;
-
-    memcpy(dest->data, src->data, src->length);
+void PS_Free(PS_String *str) {
+    free(str->data);
+    free(str);
+    str = NULL;
 }
 
-PS_String* PS_Duplicate(PS_String *src) {
-    if (!src || !src->data) return NULL;
-
-    PS_String *copy = (PS_String*)malloc(sizeof(PS_String));
-    if (!copy) return NULL;
-
-    copy->length = src->length;
-    copy->data = (char*)malloc(copy->length * sizeof(char));
-    if (!copy->data) {
-        free(copy);
-        return NULL;
+/* example usage
+int main() {
+    PS_String *my_str = PS_Create(10);
+    if (my_str != NULL) {
+        PS_Set(my_str, "Hello, World!");
+        printf("String: %s\n", PS_Get(my_str));
+        PS_Free(my_str);
+    } else {
+        printf("Memory allocation failed.\n");
     }
 
-    memcpy(copy->data, src->data, src->length);
-
-    return copy;
+    return 0;
 }
-
-PS_String* PS_Concat(PS_String *str1, PS_String *str2) {
-    if (!str1 || !str2 || !str1->data || !str2->data) return NULL;
-
-    PS_String *result = (PS_String*)malloc(sizeof(PS_String));
-    if (!result) return NULL;
-
-    result->length = str1->length + str2->length;
-    result->data = (char*)malloc(result->length * sizeof(char));
-    if (!result->data) {
-        free(result);
-        return NULL;
-    }
-
-    memcpy(result->data, str1->data, str1->length);
-    memcpy(result->data + str1->length, str2->data, str2->length);
-
-    return result;
-}
+*/

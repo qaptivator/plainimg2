@@ -5,6 +5,7 @@
 #include <libgen.h>
 #include <string.h>
 #include "plainIMG_rc.h"
+#include "plainSTR.h"
 
 #ifndef PLAINIMG_VERSION
 #define PLAINIMG_VERSION "UNKNOWN"
@@ -47,6 +48,7 @@ struct AppState {
     SDL_Texture *texture;
     SDL_FRect *textureRect;
     //char *imagePath;
+    PS_String *imageName;
     bool textureLoaded;
     bool quitApp;
     bool needRedraw;
@@ -176,7 +178,7 @@ void writeStateToFile(struct AppState *state) {
     }
 }*/
 
-void updateWindowTitle(struct AppState *state) {
+/*void updateWindowTitle(struct AppState *state) {
     // i kind of hate this logic lol
     SDL_SetWindowTitle(state->window, 
         state->keepWindowAspectRatio
@@ -187,6 +189,27 @@ void updateWindowTitle(struct AppState *state) {
                 ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP)
                 : WINDOW_TITLE
     );
+}*/
+
+void updateWindowTitle(struct AppState *state) {
+    char *staticText = state->keepWindowAspectRatio
+            ? state->alwaysOnTop 
+                ? CONCAT(WINDOW_TITLE, CONCAT(WINDOW_TITLE_TOP, WINDOW_TITLE_WK))
+                : CONCAT(WINDOW_TITLE, WINDOW_TITLE_WK)
+            : state->alwaysOnTop 
+                ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP)
+                : WINDOW_TITLE;
+
+    char fullText[strlen(staticText) + state->imageName->size + 4];
+    fullText[0] = '\0';
+
+    strcat(fullText, staticText);
+    if (state->textureLoaded) {
+        strcat(fullText, " \"");
+        strcat(fullText, PS_Get(state->imageName));
+        strcat(fullText, "\"");
+    }
+    SDL_SetWindowTitle(state->window, fullText);
 }
 
 void calculateTextureRect(struct AppState *state) {
@@ -289,7 +312,7 @@ HWND getHwndFromWindow(SDL_Window *window) {
 }
 
 // unfortunately this function is windows-only now womp womp
-void openImage(struct AppState *state, const char *path) {
+void openImage(struct AppState *state, char *path) {
     state->needRedraw = true;
 
     if (path == NULL) {
@@ -341,6 +364,7 @@ void openImage(struct AppState *state, const char *path) {
 
     state->texture = newTexture;
     state->textureLoaded = true;
+    PS_Set(state->imageName, basename(path));
 
     updateUseAntialiasing(state);
     resizeWindowToImage(state);
@@ -690,6 +714,12 @@ int main(int argc, char* argv[]) {
     state.dragY = 0;
     state.keepWindowAspectRatio = false;
     readStateFromFile(&state);
+
+    state.imageName = PS_Create(1);
+    if (state.imageName == NULL) {
+        SDL_Log("Memory allocation failed for imageName");
+        return -1;
+    }
 
     SDL_FRect _textureRect;
     state.textureRect = &_textureRect;
