@@ -19,16 +19,12 @@
 #define REPO_URL "https://github.com/qaptivator/plainimg2"
 
 #define SETTINGS_FILE_NAME "settings.txt"
-#define SETTINGS_FILE_MESSAGE "zero is false, one is true\norder matters here\nkeepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio\n"
-
-// TODO: add the image filename to the window's title
-//#define WINDOW_TITLE "plainIMG"
-//#define WINDOW_TILTE_TOP "plainIMG [TOP]"
+#define SETTINGS_FILE_MESSAGE "zero is false, one is true\norder matters here\nkeepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio showImageName\n"
+#define OPEN_IMAGE_FILTER "Image Files\0*.BMP;*.JPG;*.JPEG;*.PNG;*.GIF\0All Files\0*.*\0";
 
 #define WINDOW_TITLE "plainIMG"
 #define WINDOW_TITLE_TOP " [TOP]"
 #define WINDOW_TITLE_WK " [WK]"
-//#define WINDOW_TITLE_TOP " [TOP]"
 
 #define CONCAT(a, b) a b
 #define CHECK_STATE(cond) ((cond) ? MF_CHECKED : MF_UNCHECKED)
@@ -58,6 +54,7 @@ struct AppState {
     bool useAntialiasing;
     bool alwaysOnTop;
     bool keepWindowAspectRatio;
+    bool showImageName;
 
     bool dragging;
     int dragX, dragY;
@@ -100,7 +97,7 @@ void insertStr(char *str, int index, const char *insert, int buf_size) {
 void readStateFromFile(struct AppState *state) {
     FILE *file = fopen(SETTINGS_FILE_NAME, "r");
     if (!file) {
-        //SDL_Log("Couldn't open settings.txt for reading! Going back to default settings.");
+        SDL_Log("Couldn't open settings.txt for reading! Going back to default settings.");
         return;
     }
 
@@ -108,21 +105,25 @@ void readStateFromFile(struct AppState *state) {
     int index = 0;
     bool value = false;
 
-    // ORDER: keepAspectRatio useBlackBg useAntialiasing alwaysOnTop
+    // ORDER: keepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio showImageName
     while ((ch = fgetc(file)) != EOF) {
         if (ch == '0' || ch == '1') {
             value = ch == '1';
             switch (index) {
+                // I COMPLETELY FORGOT BREAK STATEMENTS LOL
                 case 0:
-                    state->keepAspectRatio = value;
+                    state->keepAspectRatio       = value;
                 case 1:
-                    state->useBlackBg = value;
+                    state->useBlackBg            = value;
                 case 2:
-                    state->useAntialiasing = value;
+                    state->useAntialiasing       = value;
                 case 3:
-                    state->alwaysOnTop = value;
+                    state->alwaysOnTop           = value;
                 case 4:
                     state->keepWindowAspectRatio = value;
+                case 5:
+                    SDL_Log("showImageName readStateFromFile bool: %i", value);
+                    state->showImageName         = value;
             }
             index++;
         }
@@ -134,28 +135,27 @@ void readStateFromFile(struct AppState *state) {
 void writeStateToFile(struct AppState *state) {
     FILE *file = fopen(SETTINGS_FILE_NAME, "w");
     if (!file) {
-        //SDL_Log("Couldn't open settings.txt for writing! Failed saving your settings.");
+        SDL_Log("Couldn't open settings.txt for writing! Failed saving your settings.");
         return;
     }
 
-    // ORDER: keepAspectRatio useBlackBg useAntialiasing alwaysOnTop
     fprintf(file, SETTINGS_FILE_MESSAGE);
-    fputc(BOOL_TO_INT(state->keepAspectRatio), file);
-    fputc(BOOL_TO_INT(state->useBlackBg), file);
-    fputc(BOOL_TO_INT(state->useAntialiasing), file);
-    fputc(BOOL_TO_INT(state->alwaysOnTop), file);
-    fputc(BOOL_TO_INT(state->keepWindowAspectRatio), file);
+    fputc(BOOL_TO_INT(state->keepAspectRatio       ), file);
+    fputc(BOOL_TO_INT(state->useBlackBg            ), file);
+    fputc(BOOL_TO_INT(state->useAntialiasing       ), file);
+    fputc(BOOL_TO_INT(state->alwaysOnTop           ), file);
+    fputc(BOOL_TO_INT(state->keepWindowAspectRatio ), file);
+    fputc(BOOL_TO_INT(state->showImageName         ), file);
+    SDL_Log("showImageName writeStateToFile bool: %i", state->showImageName);
+    SDL_Log("showImageName writeStateToFile: %c", BOOL_TO_INT(state->showImageName));
 
     fclose(file);
 }
-
-// todo: test this function out in keepAspectRatio SDL_SetWindowAspectRatio
 
 /*char* getStaticWindowTitle(struct AppState *state) {
     return state->alwaysOnTop ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP) : WINDOW_TITLE;
 }*/
 
-// todo: just allocate the image path normally lol
 /*void updateWindowTitle(struct AppState *state, const char *imagePath) {
     /*const char *staticTitle = getStaticWindowTitle(state);
     if (state->textureLoaded) {
@@ -204,7 +204,7 @@ void updateWindowTitle(struct AppState *state) {
     fullText[0] = '\0';
 
     strcat(fullText, staticText);
-    if (state->textureLoaded) {
+    if (state->textureLoaded && state->showImageName) {
         strcat(fullText, " \"");
         strcat(fullText, PS_Get(state->imageName));
         strcat(fullText, "\"");
@@ -317,12 +317,12 @@ void openImage(struct AppState *state, char *path) {
 
     if (path == NULL) {
         state->textureLoaded = false;
+        updateKeepWindowAspectRatio(state);
         return;
     }
 
     HWND hwnd = getHwndFromWindow(state->window);
 
-    // close SDL_IOStream with SDL_CloseIO(stream);
     SDL_IOStream *stream = SDL_IOFromFile(path, "r");
     if (stream == NULL) {
         // file doesnt exist
@@ -331,7 +331,7 @@ void openImage(struct AppState *state, char *path) {
         return;
     }
 
-    if (IMG_isWEBP(stream)) {
+    /*if (IMG_isWEBP(stream)) {
         SDL_Log("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image.");
         MessageBox(hwnd, TEXT("WebP is not supported in plainIMG. Eiether convert it to a different image format, or select another image."), TEXT("plainIMG Error"), MB_OK | MB_ICONERROR);
         state->textureLoaded = false;
@@ -351,13 +351,14 @@ void openImage(struct AppState *state, char *path) {
         state->textureLoaded = false;
         SDL_CloseIO(stream);
         return;
-    }
+    }*/
 
     // the last option automatically closes the stream
     SDL_Texture *newTexture = IMG_LoadTexture_IO(state->renderer, stream, true);
     if (newTexture == NULL) {
         // SDL3_image CANNOT parse webp files. or else you get this error:
         // Failed loading libwebpdemux-2.dll: The specified module could not be found.
+        MessageBox(hwnd, TEXT("Couldn't open the image! Your file format is either not supported, or these was an internal error. Currently unsupported file formats: WebP, TIFF, AVIF."), TEXT("plainIMG Error"), MB_OK | MB_ICONERROR);
         SDL_Log("IMG_LoadTexture error at setImagePath: %s", SDL_GetError());
         return;
     }
@@ -384,7 +385,8 @@ void openImageWithDialog(struct AppState *state) {
     ofn.hwndOwner = hwnd;
     ofn.lpstrFile = filePath;
     ofn.nMaxFile = sizeof(filePath);
-    ofn.lpstrFilter = "Image Files\0*.BMP;*.JPG;*.JPEG;*.PNG;*.GIF;*.TIFF;*.WEBP\0All Files\0*.*\0";
+    //ofn.lpstrFilter = "Image Files\0*.BMP;*.JPG;*.JPEG;*.PNG;*.GIF;*.TIFF;*.WEBP\0All Files\0*.*\0";
+    ofn.lpstrFilter = OPEN_IMAGE_FILTER;
     ofn.nFilterIndex = 1;
     ofn.lpstrFileTitle = NULL;
     ofn.nMaxFileTitle = 0;
@@ -418,6 +420,7 @@ void showContextMenu(struct AppState *state, int x, int y) {
     AppendMenu(hMenu, MF_STRING, 5, "Resize window to image\tR");
     AppendMenu(hMenu, CHECK_STATE(state->useBlackBg), 6, "Use black background\tB");
     AppendMenu(hMenu, CHECK_STATE(state->useAntialiasing), 7, "Use antialiasing\tL");
+    AppendMenu(hMenu, CHECK_STATE(state->showImageName), 12, "Show image name\tS");
     AppendMenu(hMenu, MF_SEPARATOR, 10, "");
     AppendMenu(hMenu, MF_STRING, 8, "About");
     AppendMenu(hMenu, MF_STRING, 9, "Quit\tQ");
@@ -466,6 +469,10 @@ void showContextMenu(struct AppState *state, int x, int y) {
         case 11:
             state->keepWindowAspectRatio = !state->keepWindowAspectRatio;
             updateKeepWindowAspectRatio(state);
+            break;
+        case 12:
+            state->showImageName = !state->showImageName;
+            updateWindowTitle(state);
             break;
     }
 
@@ -678,6 +685,11 @@ void handleEvent(struct AppState *state, SDL_Event *event) {
                     state->keepWindowAspectRatio = !state->keepWindowAspectRatio;
                     updateKeepWindowAspectRatio(state);
                     break;
+
+                case SDLK_S:
+                    state->showImageName = !state->showImageName;
+                    updateWindowTitle(state);
+                    break;
             }
             break;
     }
@@ -703,35 +715,41 @@ int main(int argc, char* argv[]) {
     state.renderer = NULL;
     state.texture = NULL;
     state.textureLoaded = false;
-    state.keepAspectRatio = true;
-    state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
-    state.alwaysOnTop = true;
-    state.useAntialiasing = true;
     state.quitApp = false;
     state.needRedraw = false;
     state.dragging = false;
     state.dragX = 0;
     state.dragY = 0;
+
+    // SETTINGS DEFAULTS
+    state.keepAspectRatio = true;
+    state.useBlackBg = false; // TODO: default to system's dark mode with 'SystemParametersInfo(SPI_GETCLIENTAREAOFWINDOW, 0, &is_dark_mode, 0)' inside 'windows.h'
+    state.alwaysOnTop = true;
+    state.useAntialiasing = true;
     state.keepWindowAspectRatio = false;
+    state.showImageName = true;
+    state.showImageName = false;
     readStateFromFile(&state);
 
+    // imageName
     state.imageName = PS_Create(1);
     if (state.imageName == NULL) {
         SDL_Log("Memory allocation failed for imageName");
         return -1;
     }
 
+    // sdl texture rect
     SDL_FRect _textureRect;
     state.textureRect = &_textureRect;
 
-    // init
+    // sdl init
     int result = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     if (result < 0) {
         SDL_Log("SDL_Init error: %s", SDL_GetError());
         return -1;
     }
 
-    // window
+    // sdl window
     state.window = SDL_CreateWindow("plainIMG", W_WIDTH, W_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN); // SDL_WINDOW_RESIZABLE or 0
     if (state.window == NULL) {
         SDL_Log("SDL_CreateWindow error: %s", SDL_GetError());
@@ -739,7 +757,7 @@ int main(int argc, char* argv[]) {
     }
     SDL_SetWindowMinimumSize(state.window, WMIN_WIDTH, WMIN_HEIGHT);
 
-    // renderer
+    // sdl renderer
     state.renderer = SDL_CreateRenderer(state.window, NULL);
     if (state.renderer == NULL) {
         SDL_Log("SDL_CreateRenderer error: %s", SDL_GetError());

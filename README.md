@@ -47,7 +47,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
 - note: when you click the "Set plainIMG as the default image viewer" option in the installer, it automatically sets plainIMG as default for: .jpg, .jpeg, .png and .bmp; if you want to extend this list, update file extension defaults yourself in windows settings.
 - TIFF, AVIF and WEBP are not supported.
-- your settings (keepAspectRatio, useBlackBg, useAntialiasing and alwaysOnTop) are stored inside `settings.txt`. i serialize these bools into string of 0's and 1's, where 0 is false, 1 is true. the order of those numbers matters here. the order was specified at the start of this point. anything other than 0 or 1 is considered a comment and just ignored.
+- your settings (keepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio showImageName) are stored inside `settings.txt`. i serialize these bools into string of 0's and 1's, where 0 is false, 1 is true. the order of those numbers matters here. the order was specified at the start of this point. anything other than 0 or 1 is considered a comment and just ignored.
 
 # screenshots
 
