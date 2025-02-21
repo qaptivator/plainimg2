@@ -138,7 +138,7 @@ void readStateFromFile(struct AppState *state) {
     SDL_Log("keepAspectRatio: %d, useBlackBg: %d, useAntialiasing: %d, alwaysOnTop: %d, keepWindowAspectRatio: %d, showImageName: %d",
     state->keepAspectRatio, state->useBlackBg, state->useAntialiasing, state->alwaysOnTop, state->keepWindowAspectRatio, state->showImageName);
 
-    fflush(file);
+    //fflush(file);
     fclose(file);
 }
 
