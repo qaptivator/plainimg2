@@ -15,7 +15,7 @@
 #define W_HEIGHT 600
 #define WMIN_WIDTH 150
 #define WMIN_HEIGHT 150
-#define MAX_PATH 1000
+#define MAX_IMG_PATH 1000
 #define REPO_URL "https://github.com/qaptivator/plainimg2"
 
 #define SETTINGS_FILE_NAME "settings.txt"
@@ -93,80 +93,6 @@ void insertStr(char *str, int index, const char *insert, int buf_size) {
     memmove(&str[index + ins_len], &str[index], len - index + 1);
     memcpy(&str[index], insert, ins_len);
 }*/
-
-void readStateFromFile(struct AppState *state) {
-    FILE *file = fopen(SETTINGS_FILE_NAME, "r");
-    if (!file) {
-        SDL_Log("Couldn't open settings.txt for reading! Going back to default settings.");
-        return;
-    }
-
-    int ch;
-    int index = 0;
-    bool value = false;
-
-    // ORDER: keepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio showImageName
-    while ((ch = fgetc(file)) != EOF) {
-        if (ch == '0' || ch == '1') {
-            value = ch == '1';
-            switch (index) {
-                // I COMPLETELY FORGOT BREAK STATEMENTS LOL
-                case 0:
-                    state->keepAspectRatio       = value;
-                    break;
-                case 1:
-                    state->useBlackBg            = value;
-                    break;
-                case 2:
-                    state->useAntialiasing       = value;
-                    break;
-                case 3:
-                    state->alwaysOnTop           = value;
-                    break;
-                case 4:
-                    state->keepWindowAspectRatio = value;
-                    break;
-                case 5:
-                    state->showImageName         = value;
-                    break;
-            }
-            index++;
-        }
-    }
-
-    SDL_Log("Opened settings...");
-    SDL_Log("keepAspectRatio: %d, useBlackBg: %d, useAntialiasing: %d, alwaysOnTop: %d, keepWindowAspectRatio: %d, showImageName: %d",
-    state->keepAspectRatio, state->useBlackBg, state->useAntialiasing, state->alwaysOnTop, state->keepWindowAspectRatio, state->showImageName);
-
-    //fflush(file);
-    fclose(file);
-}
-
-// todo: when i run app, do changes to state, then quit, it saves fine. but if i run app, OPEN IMAGE, do changes to state, then quit, IT DOESNT SAVE TO FILE.
-void writeStateToFile(struct AppState *state) {
-    FILE *file = fopen(SETTINGS_FILE_NAME, "w");
-    if (file == NULL) {
-        SDL_Log("Couldn't open settings.txt for writing! Failed saving your settings.");
-        return;
-    }
-
-    SDL_Log("Saving settings...");
-    SDL_Log("keepAspectRatio: %d, useBlackBg: %d, useAntialiasing: %d, alwaysOnTop: %d, keepWindowAspectRatio: %d, showImageName: %d",
-    state->keepAspectRatio, state->useBlackBg, state->useAntialiasing, state->alwaysOnTop, state->keepWindowAspectRatio, state->showImageName);
-
-    fprintf(file, SETTINGS_FILE_MESSAGE);
-    fputc(BOOL_TO_INT(state->keepAspectRatio       ), file);
-    fputc(BOOL_TO_INT(state->useBlackBg            ), file);
-    fputc(BOOL_TO_INT(state->useAntialiasing       ), file);
-    fputc(BOOL_TO_INT(state->alwaysOnTop           ), file);
-    fputc(BOOL_TO_INT(state->keepWindowAspectRatio ), file);
-    fputc(BOOL_TO_INT(state->showImageName         ), file);
-    //SDL_Log("showImageName writeStateToFile bool: %i", state->showImageName);
-    //SDL_Log("showImageName writeStateToFile: %c", BOOL_TO_INT(state->showImageName));
-
-    //fflush(file);
-    fclose(file);
-}
 
 /*char* getStaticWindowTitle(struct AppState *state) {
     return state->alwaysOnTop ? CONCAT(WINDOW_TITLE, WINDOW_TITLE_TOP) : WINDOW_TITLE;
@@ -311,6 +237,26 @@ void resizeWindowToImage(struct AppState *state) {
 #ifdef _WIN32
 #include <windows.h>
 
+char* getExecutableDirectory() {
+    static char exePath[MAX_IMG_PATH];
+    GetModuleFileName(NULL, exePath, MAX_IMG_PATH);
+    char *dir = dirname(exePath);
+    return dir;
+}
+
+char* getSettingsPath() {
+    char* exeDir = getExecutableDirectory();
+    if (exeDir == NULL) {
+        SDL_Log("Failed to get the executable directory!");
+        return NULL;
+    }
+
+    static char settingsPath[MAX_IMG_PATH];
+    snprintf(settingsPath, sizeof(settingsPath), "%s/%s", exeDir, SETTINGS_FILE_NAME);
+
+    return settingsPath;
+}
+
 HWND getHwndFromWindow(SDL_Window *window) {
     SDL_PropertiesID props = SDL_GetWindowProperties(window);
     if (props == 0) {
@@ -393,7 +339,7 @@ void openImageWithDialog(struct AppState *state) {
     // and SDL_ttf for text instead of an static image
     HWND hwnd = getHwndFromWindow(state->window);
 
-    char filePath[MAX_PATH] = {0};
+    char filePath[MAX_IMG_PATH] = {0};
 
     OPENFILENAME ofn;
     ZeroMemory(&ofn, sizeof(ofn));
@@ -587,6 +533,92 @@ HWND getHwndFromWindow(SDL_Window *window) {}
 // i dont even care about these definitions anymore
 #endif
 
+void readStateFromFile(struct AppState *state) {
+    char* settingsPath = getSettingsPath();
+    if (settingsPath == NULL) {
+        SDL_Log("Settings path was not found! Going back to default settings.");
+        return;
+    }
+
+    FILE *file = fopen(settingsPath, "r");
+    if (!file) {
+        SDL_Log("Couldn't open %s for reading! Going back to default settings.", SETTINGS_FILE_NAME);
+        return;
+    }
+
+    int ch;
+    int index = 0;
+    bool value = false;
+
+    // ORDER: keepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio showImageName
+    while ((ch = fgetc(file)) != EOF) {
+        if (ch == '0' || ch == '1') {
+            value = ch == '1';
+            switch (index) {
+                // I COMPLETELY FORGOT BREAK STATEMENTS LOL
+                case 0:
+                    state->keepAspectRatio       = value;
+                    break;
+                case 1:
+                    state->useBlackBg            = value;
+                    break;
+                case 2:
+                    state->useAntialiasing       = value;
+                    break;
+                case 3:
+                    state->alwaysOnTop           = value;
+                    break;
+                case 4:
+                    state->keepWindowAspectRatio = value;
+                    break;
+                case 5:
+                    state->showImageName         = value;
+                    break;
+            }
+            index++;
+        }
+    }
+
+    SDL_Log("Opened settings...");
+    SDL_Log("keepAspectRatio: %d, useBlackBg: %d, useAntialiasing: %d, alwaysOnTop: %d, keepWindowAspectRatio: %d, showImageName: %d",
+    state->keepAspectRatio, state->useBlackBg, state->useAntialiasing, state->alwaysOnTop, state->keepWindowAspectRatio, state->showImageName);
+
+    //fflush(file);
+    fclose(file);
+}
+
+// todo: when i run app, do changes to state, then quit, it saves fine. but if i run app, OPEN IMAGE, do changes to state, then quit, IT DOESNT SAVE TO FILE.
+void writeStateToFile(struct AppState *state) {
+    char* settingsPath = getSettingsPath();
+    if (settingsPath == NULL) {
+        SDL_Log("Settings path was not found! Going back to default settings.");
+        return;
+    }
+
+    FILE *file = fopen(settingsPath, "w");
+    if (file == NULL) {
+        SDL_Log("Couldn't open %s for writing! Failed saving your settings.", SETTINGS_FILE_NAME);
+        return;
+    }
+
+    SDL_Log("Saving settings...");
+    SDL_Log("keepAspectRatio: %d, useBlackBg: %d, useAntialiasing: %d, alwaysOnTop: %d, keepWindowAspectRatio: %d, showImageName: %d",
+    state->keepAspectRatio, state->useBlackBg, state->useAntialiasing, state->alwaysOnTop, state->keepWindowAspectRatio, state->showImageName);
+
+    fprintf(file, SETTINGS_FILE_MESSAGE);
+    fputc(BOOL_TO_INT(state->keepAspectRatio       ), file);
+    fputc(BOOL_TO_INT(state->useBlackBg            ), file);
+    fputc(BOOL_TO_INT(state->useAntialiasing       ), file);
+    fputc(BOOL_TO_INT(state->alwaysOnTop           ), file);
+    fputc(BOOL_TO_INT(state->keepWindowAspectRatio ), file);
+    fputc(BOOL_TO_INT(state->showImageName         ), file);
+    //SDL_Log("showImageName writeStateToFile bool: %i", state->showImageName);
+    //SDL_Log("showImageName writeStateToFile: %c", BOOL_TO_INT(state->showImageName));
+
+    //fflush(file);
+    fclose(file);
+}
+
 void drawFrame(struct AppState *state) {
     //SDL_Log("draw");
     int _bgColor = state->useBlackBg ? 0 : 0xff;
@@ -744,7 +776,6 @@ int main(int argc, char* argv[]) {
     state.useAntialiasing = true;
     state.keepWindowAspectRatio = false;
     state.showImageName = true;
-    state.showImageName = false;
     readStateFromFile(&state);
 
     // imageName
