@@ -17,12 +17,14 @@ ChangesAssociations=yes
 [Files]
 Source: "build\release\static\plainIMG_static.exe"; DestDir: "{app}"; DestName: "plainIMG.exe"; Flags: ignoreversion
 
-[Icons]
-Name: "{group}\plainIMG"; Filename: "{app}\plainIMG.exe"
-Name: "{userdesktop}\plainIMG"; Filename: "{app}\plainIMG.exe"
-
 [Tasks]
-Name: "plainimgAsDefaultAssoc"; Description: "Set plainIMG as the default image viewer"; GroupDescription: "File extensions:"; Flags: unchecked
+Name: "plainimgAsDefaultAssoc"; Description: "Set plainIMG as the default image viewer"; GroupDescription: "Additional features:"; Flags: unchecked
+Name: "addPlainimgToDesktop"; Description: "Add plainIMG to the desktop"; GroupDescription: "Additional features:"; Flags: unchecked
+Name: "addPlainimgToStart"; Description: "Add plainIMG to the start menu"; GroupDescription: "Additional features:"
+
+[Icons]
+Name: "{group}\plainIMG"; Filename: "{app}\plainIMG.exe"; Tasks: addPlainimgToStart
+Name: "{userdesktop}\plainIMG"; Filename: "{app}\plainIMG.exe"; Tasks: addPlainimgToDesktop
 
 [Registry]
 Root: HKCR; Subkey: "plainIMG"; ValueType: string; ValueName: ""; ValueData: "plainIMG Image Viewer"; Flags: uninsdeletekey
