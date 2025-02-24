@@ -13,7 +13,7 @@ _///// as simple as it gets for an image viewer /////_
 
 # usage
 
-- install the installer from the latest release.
+- **install the installer from the latest release. (`plainIMG_vN.N.N_installer.exe`)**
 - run it and it will install the app, and also add plainIMG to start menu. if you click the "Set plainIMG as the default image viewer" option, jpg, jpeg, png and bmp file extensions will be associated with plainIMG.
 - now that it is installed, you can open an image, select plainIMG and click "Always".
 - alternatively, you can go to settings, default apps, and set common image formats to plainIMG.
