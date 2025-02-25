@@ -101,7 +101,7 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 - [ ] fix the fact that sometimes, when you resize window to image, it just doesnt properly resize, and it keeps on resizing
 - [x] optimize the app so that it wont rerender every time, even though there are no changes
 - [x] reduce the cpu usage spike when dragging or resizing the window
-- [ ] add support for animated GIFs.
+- [ ] add support for animated GIFs using [IMG_LoadAnimation](https://wiki.libsdl.org/SDL3_image/IMG_LoadAnimation)
 - [ ] add support for WEBP (probably never).
 
 # build
