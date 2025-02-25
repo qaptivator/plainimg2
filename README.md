@@ -113,7 +113,6 @@ mark your release with `./tag_release.sh`. it will automatically push it. **make
 
 - [x] save menu configurations to some text file, so that it will save between launches
 - [ ] add a reminder when there is a new version of this app
-- [ ] finish up lite mode
 - [x] add icon to the executable with windres
 - [x] build this exe statically (basically you need to have .a's instead of .dll's)
 - [ ] make a lite mode where the title bar will be hidden, so you will be able to see just the picture
@@ -121,9 +120,10 @@ mark your release with `./tag_release.sh`. it will automatically push it. **make
 - [x] make an inno setup installer
 - [ ] fix the client area dragging being a bit choppy
 - [x] add a global VERSION.txt file which will be used everywhere (main.c, installer.iss, tag_release.sh etc)
-- [ ] add the image basename when an image is opened to the window's title
+- [x] add the image basename when an image is opened to the window's title
 - [ ] possibly make an .msi installer
-- [ ] make the app notify you if it couldnt open an app instead of just silencing it
+- [x] make the app notify you if it couldnt open an image instead of just silencing it
 - [ ] fix the fact that sometimes, when you resize window to image, it just doesnt properly resize, and it keeps on resizing
 - [x] optimize the app so that it wont rerender every time, even though there are no changes
-- [ ] reduce the cpu usage spike when dragging or resizing the window
+- [x] reduce the cpu usage spike when dragging or resizing the window
+- [ ] add support for WEBP and GIF (properly animated)
