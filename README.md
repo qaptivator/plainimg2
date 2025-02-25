@@ -140,6 +140,7 @@ after that it will make a `libSDL3.a`. copy it to `plainimg2/src/SLD3/lib`.
 
 ```sh
 git clone https://github.com/libsdl-org/SDL_image.git && cd SDL_image
+git clone https://github.com/libsdl-org/SDL.git # SDL_image requires SDL as a dependency
 git submodule update --init --recursive
 mkdir build && cd build
 cmake .. -DBUILD-SHARED-LIBS=OFF
