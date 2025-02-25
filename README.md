@@ -47,6 +47,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
 - note: when you click the "Set plainIMG as the default image viewer" option in the installer, it automatically sets plainIMG as default for: .jpg, .jpeg, .png and .bmp; if you want to extend this list, update file extension defaults yourself in windows settings.
 - TIFF, AVIF and WEBP are not supported.
+- animated GIFs are not supported.
 - your settings (keepAspectRatio useBlackBg useAntialiasing alwaysOnTop keepWindowAspectRatio showImageName) are stored inside `settings.txt`. i serialize these bools into string of 0's and 1's, where 0 is false, 1 is true. the order of those numbers matters here. the order was specified at the start of this point. anything other than 0 or 1 is considered a comment and just ignored.
 
 # screenshots
@@ -83,32 +84,6 @@ this project is also my first, fully finished C project, which i am quite proud 
 
 licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 
-# build
-
-- SDL3 is included inside this repository, so just clone this repository
-- you need vs c/c++ redistributable and gcc installed
-- run `./build.sh`, and it will build everything for you with gcc inside `build/debug`. run with `./build/debug/plainIMG.exe` (or `./build.sh -a` for short)
-- if youre not statically building with `-s`, you NEED to have `SDL3.dll` and `SDL3_image.dll` located in the same directory as the executable.
-- build the resoures (icon + welcome text) with `windres src/plainIMG.rc -O coff -o src/plainIMG_rc.o`
-
-libraries used: [SDL 3](https://github.com/libsdl-org/SDL), [SDL3_image 3](https://github.com/libsdl-org/SDL_image/),
-
-if you want to update SDL or SLD_Image, you would have to build static binaries (`*.a`) yourself.  
-just clone the repositores, make a `build` folder, inside it run `cmake .. -DSDL_STATIC=ON` and `cmake --build .`.  
-then, just copy over generated `.a` files to `lib/` folder of each library.
-
-for SDL3_image, there is a special case. copy over the entire SDL folder, where you just built it inside `build/`,  
-then run SDL3_image build with `cmake .. -DBUILD-SHARED-LIBS=OFF`, then do `cmake --build .`.
-you would also need to use `git submodule update --init --recursive` in SDL image.
-
-~~if you want to make changes, then make your changes in `dev` branch, and sync them to main with `./sync.sh`. when you want to release, switch to `main`.~~  
-to make things simpler, just commit and push everything to main lol.
-
-you need inno setup installed to build for release, and it should be in the PATH.  
-when you want to build a new release, edit `VERSION.txt` with the version format being `vX.X.X`.  
-to build all the things for release, run `./release.sh`. it will create `build/release`, where `build/release/upload` is the things you would need to upload to github release.  
-mark your release with `./tag_release.sh`. it will automatically push it. **make sure that you correctly specify the version, and it's not a duplicate**
-
 # todo list
 
 - [x] save menu configurations to some text file, so that it will save between launches
@@ -126,4 +101,69 @@ mark your release with `./tag_release.sh`. it will automatically push it. **make
 - [ ] fix the fact that sometimes, when you resize window to image, it just doesnt properly resize, and it keeps on resizing
 - [x] optimize the app so that it wont rerender every time, even though there are no changes
 - [x] reduce the cpu usage spike when dragging or resizing the window
-- [ ] add support for WEBP and GIF (properly animated)
+- [ ] add support for animated GIFs.
+- [ ] add support for WEBP (probably never).
+
+# build
+
+- SDL3 is included inside this repository, so just clone this repository
+- you need vs c/c++ redistributable and gcc installed
+- run `./build.sh`, and it will build everything for you with gcc inside `build/debug`. run with `./build/debug/plainIMG.exe` (or `./build.sh -a` for short)
+- if youre not statically building with `-s`, you NEED to have `SDL3.dll` and `SDL3_image.dll` located in the same directory as the executable.
+- build the resoures (icon + welcome text) with `windres src/plainIMG.rc -O coff -o src/plainIMG_rc.o`
+
+libraries used: [SDL 3](https://github.com/libsdl-org/SDL), [SDL3_image 3](https://github.com/libsdl-org/SDL_image/),
+
+## build the installer
+
+you need inno setup installed to build for release, and it should be in the PATH.  
+when you want to build a new release, edit `VERSION.txt` with the version format being `vX.X.X`.  
+to build all the things for release, run `./release.sh`. it will create `build/release`, where `build/release/upload` is the things you would need to upload to github release.  
+mark your release with `./tag_release.sh`. it will automatically push it. **make sure that you correctly specify the version, and it's not a duplicate**
+
+## build SDL3 and SDL_image manually
+
+if you want to update SDL or SLD_Image, you would have to build static binaries (`*.a`) yourself.  
+
+### build SDL3
+
+```sh
+git clone https://github.com/libsdl-org/SDL.git && cd SDL
+mkdir build && cd build
+cmake .. -DSDL_STATIC=ON
+cmake --build .
+```
+
+after that it will make a `libSDL3.a`. copy it to `plainimg2/src/SLD3/lib`.
+
+### build SDL_image
+
+```sh
+git clone https://github.com/libsdl-org/SDL_image.git && cd SDL_image
+git submodule update --init --recursive
+mkdir build && cd build
+cmake .. -DBUILD-SHARED-LIBS=OFF
+cmake --build .
+```
+
+after that it will make a `libSDL_image.a`. copy it to `plainimg2/src/SDL3_image/lib`.  
+SDL_image will also give errors where certain libraries are not found.  
+these libraries are required for other file formats like WebP to work.  
+i tried building them myself statically but its just very painful to do.  
+that is why im not planning on adding support to WebP, TIFF and other unsupported formats.
+
+# old build (do not read this)
+
+just clone the repositores, make a `build` folder, inside it run `cmake .. -DSDL_STATIC=ON` and `cmake --build .`.  
+then, just copy over generated `.a` files to `lib/` folder of each library.
+
+for SDL3_image, there is a special case. copy over the entire SDL folder, where you just built it inside `build/`,  
+then run SDL3_image build with `cmake .. -DBUILD-SHARED-LIBS=OFF`, then do `cmake --build .`.
+you would also need to use `git submodule update --init --recursive` in SDL image.
+
+~~if you want to make changes, then make your changes in `dev` branch, and sync them to main with `./sync.sh`. when you want to release, switch to `main`.~~  
+to make things simpler, just commit and push everything to main lol.
+
+
+
+
