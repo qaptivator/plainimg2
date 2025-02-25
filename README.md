@@ -151,19 +151,3 @@ SDL_image will also give errors where certain libraries are not found.
 these libraries are required for other file formats like WebP to work.  
 i tried building them myself statically but its just very painful to do.  
 that is why im not planning on adding support to WebP, TIFF and other unsupported formats.
-
-# old build (do not read this)
-
-just clone the repositores, make a `build` folder, inside it run `cmake .. -DSDL_STATIC=ON` and `cmake --build .`.  
-then, just copy over generated `.a` files to `lib/` folder of each library.
-
-for SDL3_image, there is a special case. copy over the entire SDL folder, where you just built it inside `build/`,  
-then run SDL3_image build with `cmake .. -DBUILD-SHARED-LIBS=OFF`, then do `cmake --build .`.
-you would also need to use `git submodule update --init --recursive` in SDL image.
-
-~~if you want to make changes, then make your changes in `dev` branch, and sync them to main with `./sync.sh`. when you want to release, switch to `main`.~~  
-to make things simpler, just commit and push everything to main lol.
-
-
-
-
