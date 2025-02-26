@@ -1,6 +1,6 @@
 # [plainIMG2](https://github.com/qaptivator/plainimg2)
 
-_///// as simple as it gets for an image viewer /////_
+_as simple as it gets for an image viewer_
 
 # why would i use this?
 
@@ -123,7 +123,7 @@ mark your release with `./tag_release.sh`. it will automatically push it. **make
 
 ## build SDL3 and SDL_image manually
 
-if you want to update SDL or SLD_Image, you would have to build static binaries (`*.a`) yourself.  
+if you want to update SDL or SLD_Image, you would have to build static binaries (`*.a`) yourself.
 
 ### build SDL3
 
