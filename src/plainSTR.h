@@ -2,6 +2,9 @@
 // a header string library for C with dynamic string allocation
 // todo: remove null terminators grrr
 
+#ifndef PLAINSTR_H
+#define PLAINSTR_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,3 +66,5 @@ int main() {
     return 0;
 }
 */
+
+#endif
