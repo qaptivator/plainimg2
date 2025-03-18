@@ -8,8 +8,9 @@ _as simple as it gets for an image viewer_
 
 ![plainIMG_open_comparison](examples/plainIMG_open_comparison.gif)
 
-2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!):
+2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!)
 3. lightweight (the executable is under 3MB!)
+4. you can drag the window around using the actual window (the client area) instead of just the title bar!
 
 # usage
 
@@ -41,7 +42,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 - keep the aspect ratio of the image with `A`. if you disable this, it will stretch the picture across the entire window. enabled by default.
 - resize the window to be the image's size with `R`. note: only works if keep aspect ratio is enabled.
 - when working with small resolution images, antialiasing usually ruins the image, so disable it with `L`. antialiasing is enabled by default.
-- the window is also draggable in client area (other than the title bar), but be aware that native windows functions like window snapping wont work here. they only work with the title bar provided by windows.
+- the window is also draggable in client area (the area other than the title bar), but be aware that native windows functions like window snapping wont work here. they only work with the title bar provided by windows.
 - quit the app by closing the window, pressing `Q` or `ESCAPE`.
 - the link to this github repository is located inside the `About` menu.
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
