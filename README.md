@@ -70,7 +70,7 @@ when you keep image aspect ratio, with black background
 
 ![screenshot4](examples/screenshot4.png)
 
-when you DONT keep image aspect ratio, it stretchesthe image to the window size like this
+when you DONT keep image aspect ratio, it stretches the image to the window size like this
 
 ![screenshot5](examples/screenshot5.png)
 
