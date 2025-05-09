@@ -89,8 +89,8 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 # todo list
 
 - [x] [[[--MAIN THINGS--]]]
+- [ ] add "copy image to clipboard" and "paste image from clipboard" (TOP PRIORITY because it is most useful)
 - [ ] add folder exploration
-- [ ] add "copy image to clipboard" and "paste image from clipboard"
 - [ ] add image zooming
 - [ ] add text rendering over the image, so you can make simple text overlays
 - [ ] add support for animated GIFs using [IMG_LoadAnimation](https://wiki.libsdl.org/SDL3_image/IMG_LoadAnimation)
