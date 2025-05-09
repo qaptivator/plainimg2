@@ -103,6 +103,7 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 - [x] reduce the cpu usage spike when dragging or resizing the window
 - [ ] add support for animated GIFs using [IMG_LoadAnimation](https://wiki.libsdl.org/SDL3_image/IMG_LoadAnimation)
 - [ ] add support for WEBP (probably never).
+- [ ] possibly a bug: when you open an image and "keep image aspect ratio" is not turned on while "keep window aspect ratio" IS turned on, the image stretches to the default window size so the window aspect ratio is wrong. i wanted to fix this at first, not knowing that i can fix this by just modifying the settings, but even then i thought that making a whole minor update just to fix this one bug is just too much. so this will remain like this for now.
 
 # build
 
