@@ -54,18 +54,40 @@ to support the developer, you can appreciate the project by giving it a star in 
 
 # screenshots
 
+when you start up plainIMG without giving it an image
+
 ![screenshot1](examples/screenshot1.png)
+
+in black background mode
+
 ![screenshot2](examples/screenshot2.png)
+
+example of showing an image
+
 ![screenshot3](examples/screenshot3.png)
+
+when you keep image aspect ratio, with black background
+
 ![screenshot4](examples/screenshot4.png)
+
+when you DONT keep image aspect ratio, it stretchesthe image to the window size like this
+
 ![screenshot5](examples/screenshot5.png)
+
+disable antialiasing so you can look at crispy pixel art textures without all the blur
+
 ![screenshot6](examples/screenshot6.png)
+
+the right click menu as of v1.2.4
+
 ![screenshot7](examples/screenshot7.png)
 
 ---
 
-[VirusTotal check](https://www.virustotal.com/gui/file/790c8e66aa1ef920f819445e8b439ae7a3da877279220f05eac885881ed25e54/detection)
+[VirusTotal check (as of older versions)](https://www.virustotal.com/gui/file/790c8e66aa1ef920f819445e8b439ae7a3da877279220f05eac885881ed25e54/detection)
 ![screenshot8](examples/screenshot8.png)
+
+[VirusTotal check (as of v1.3.2)](https://www.virustotal.com/gui/file/fdb7a5cc926a939aeb6293e0c93b3ec93154eb9b28089cf5851c5c5e6bdc4723/detection)
 
 # introduction
 
