@@ -8,8 +8,10 @@ _as simple as it gets for an image viewer_
 
 ![plainIMG_open_comparison](examples/plainIMG_open_comparison.gif)
 
-2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!):
+2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!)
 3. lightweight (the executable is under 3MB!)
+4. you can drag the window around using the actual window (the client area) instead of just the title bar!
+5. other oddly specific features which arent available in most other image viewers, such as toggling antialiasing (see crisp pixels), stretching images and more.
 
 # usage
 
@@ -23,7 +25,7 @@ _as simple as it gets for an image viewer_
   - or by dragging a picture over the executable
 
 the main menu is opened with `Right Click`.
-you can close the window with `Right Click > Quit` or just `Q`, or just `ESCAPE`.
+you can close the window with `Right Click > Quit`, `Q`, `ESCAPE`, or just by closing the window.
 to make the window be the size of the image, press `R`.
 to make the window be over other windows and also dont go behind other windows when unfocused, press `T`. _this is enabled by default._  
 to see the rest of the features, look down below.  
@@ -32,7 +34,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 # all of the features
 
 - open an image using in-app file selector with `O`,
-  - or give it the image path as first argument,
+  - or give it the image path as first cli argument,
   - or as a hidden windows feature, drag an image over the executable and it will consider it as the first cli argument.
 - close an image with `C`, which puts you back into the starting menu.
 - open actions menu with `Right Click`, which shows all of the actions which you can do and their corresponding hotkeys.
@@ -41,7 +43,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 - keep the aspect ratio of the image with `A`. if you disable this, it will stretch the picture across the entire window. enabled by default.
 - resize the window to be the image's size with `R`. note: only works if keep aspect ratio is enabled.
 - when working with small resolution images, antialiasing usually ruins the image, so disable it with `L`. antialiasing is enabled by default.
-- the window is also draggable in client area (other than the title bar), but be aware that native windows functions like window snapping wont work here. they only work with the title bar provided by windows.
+- the window is also draggable in client area (the area other than the title bar), but be aware that native windows functions like window snapping wont work here. they only work with the title bar provided by windows.
 - quit the app by closing the window, pressing `Q` or `ESCAPE`.
 - the link to this github repository is located inside the `About` menu.
 - WARNING: as of now, this project is only available on Windows. if this project gets enough attention, i will make a version for macOS and possibly even Linux.
@@ -86,21 +88,27 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 
 # todo list
 
-- [x] save menu configurations to some text file, so that it will save between launches
-- [ ] add a reminder when there is a new version of this app
+- [ ] add folder exploration
+- [ ] add "copy image to clipboard" and "paste image from clipboard"
+- [ ] add image zooming
+- [ ] add text rendering over the image, so you can make simple text overlays
+- [ ] add support for animated GIFs using [IMG_LoadAnimation](https://wiki.libsdl.org/SDL3_image/IMG_LoadAnimation)
+- [ ] add support for WEBP (probably never)
+- [ ] add a reminder when there is a new version of this app (possibly with an auto-updater)
+
+- [ ] fix the fact that sometimes, when you resize window to image, it just doesnt properly resize, and it keeps on resizing
+- [ ] make a lite mode where the title bar will be hidden, so you will be able to see just the picture
+- [ ] fix the client area dragging being a bit choppy (probably isnt a bug because its barely noticeable, and its probably not fixable)
+- [ ] possibly make an .msi installer (probably not, its extremely complicated for C)
+- [x] make an inno setup installer
 - [x] add icon to the executable with windres
 - [x] build this exe statically (basically you need to have .a's instead of .dll's)
-- [ ] make a lite mode where the title bar will be hidden, so you will be able to see just the picture
-- [ ] make proper version control (possibly with an auto-updater)
-- [x] make an inno setup installer
-- [ ] fix the client area dragging being a bit choppy
 - [x] add a global VERSION.txt file which will be used everywhere (main.c, installer.iss, tag_release.sh etc)
 - [x] add the image basename when an image is opened to the window's title
-- [ ] possibly make an .msi installer
 - [x] make the app notify you if it couldnt open an image instead of just silencing it
-- [ ] fix the fact that sometimes, when you resize window to image, it just doesnt properly resize, and it keeps on resizing
 - [x] optimize the app so that it wont rerender every time, even though there are no changes
 - [x] reduce the cpu usage spike when dragging or resizing the window
+- [x] save menu configurations to some text file, so that it will save between launches
 - [ ] add support for animated GIFs using [IMG_LoadAnimation](https://wiki.libsdl.org/SDL3_image/IMG_LoadAnimation)
 - [ ] add support for WEBP (probably never).
 - [ ] possibly a bug: when you open an image and "keep image aspect ratio" is not turned on while "keep window aspect ratio" IS turned on, the image stretches to the default window size so the window aspect ratio is wrong. i wanted to fix this at first, not knowing that i can fix this by just modifying the settings, but even then i thought that making a whole minor update just to fix this one bug is just too much. so this will remain like this for now.
@@ -108,7 +116,7 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 # build
 
 - SDL3 is included inside this repository, so just clone this repository
-- you need vs c/c++ redistributable and gcc installed
+- you need `vs c/c++ redistributable` and `gcc` installed
 - run `./build.sh`, and it will build everything for you with gcc inside `build/debug`. run with `./build/debug/plainIMG.exe` (or `./build.sh -a` for short)
 - if youre not statically building with `-s`, you NEED to have `SDL3.dll` and `SDL3_image.dll` located in the same directory as the executable.
 - build the resoures (icon + welcome text) with `windres src/plainIMG.rc -O coff -o src/plainIMG_rc.o`
@@ -124,7 +132,8 @@ mark your release with `./tag_release.sh`. it will automatically push it. **make
 
 ## build SDL3 and SDL_image manually
 
-if you want to update SDL or SLD_Image, you would have to build static binaries (`*.a`) yourself.
+if you want to update SDL or SLD*Image, you would have to build static binaries (`*.a`) yourself.  
+\_this section wont be specified in great detail, and wont be kept up to date, just because many libraries handle static building in their own way, and its really painful to figure them all out and write them down here.*
 
 ### build SDL3
 
