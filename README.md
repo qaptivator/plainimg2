@@ -13,6 +13,12 @@ _as simple as it gets for an image viewer_
 4. you can drag the window around using the actual window (the client area) instead of just the title bar!
 5. other oddly specific features which arent available in most other image viewers, such as toggling antialiasing (see crisp pixels), stretching images and more.
 
+# who would use this?
+
+- pixel art artists, working with low resolution images
+- developers wanting to pin important info or graphs during development
+- students wanting to pin cheatsheets or charts during study
+
 # usage
 
 - **install the installer from the latest release. (`plainIMG_vN.N.N_installer.exe`)**
@@ -134,6 +140,10 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 - [x] reduce the cpu usage spike when dragging or resizing the window
 - [x] save menu configurations to some text file, so that it will save between launches
 - [ ] possibly a bug: when you open an image and "keep image aspect ratio" is not turned on while "keep window aspect ratio" IS turned on, the image stretches to the default window size so the window aspect ratio is wrong. i wanted to fix this at first, not knowing that i can fix this by just modifying the settings, but even then i thought that making a whole minor update just to fix this one bug is just too much. so this will remain like this for now.
+- [ ] possibly add window opacity integer input so you can layer images over other apps (to implement, use a built in SDL function, and for integrr input use windows api. the opacity will be displayed in the window title only if it's different from 100%, and displayed like `...[WK] [80%] "blah.png"`)
+- [ ] add support for transparent pngs LITERALLY being transparent, basically the above feature but masked (which makes this much, MUCH harder to implement). this will also require INTEGERS to be stored in my 0/1 format, not nice
+- [ ] add "show metadata" popup which shows basic info like resolution (VERY USEFUL for something like pixel art. or maybe you could put it in the window name near the filename...), lens information and so on. no metadata editing though, this app is all read only
+- [ ] maybe, just maybe, listen for file changes and update the preview accordingly (will obviously be an option in the menu too)
 
 # build
 
