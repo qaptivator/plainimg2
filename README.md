@@ -144,6 +144,7 @@ licensed under MIT. credits to microsoft for the retro windows icon (icon.ico).
 - [ ] add support for transparent pngs LITERALLY being transparent, basically the above feature but masked (which makes this much, MUCH harder to implement). this will also require INTEGERS to be stored in my 0/1 format, not nice
 - [ ] add "show metadata" popup which shows basic info like resolution (VERY USEFUL for something like pixel art. or maybe you could put it in the window name near the filename...), lens information and so on. no metadata editing though, this app is all read only
 - [ ] maybe, just maybe, listen for file changes and update the preview accordingly (will obviously be an option in the menu too)
+- [ ] hide the "No image was selected!" wanring, it's just annoying. usually, when the user doesnt select anything, they probably wanted to just close the browse window, OR they clicked open image accidentally
 
 # build
 
