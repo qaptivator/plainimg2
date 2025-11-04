@@ -14,7 +14,7 @@ while getopts "hprays" OPTION; do
     s) static=true ;;
     r) release=true ;;
     p) profile=true ;;
-    h) echo -e "\nUsage: $0 [-a] [-y] [-s] [-r] [-p]\n-a | autorun    | autoruns the built executable\n-y | yesconsole | removes the -mwindows flag from gcc, which is on by default\n-s | static     | adds the -static flag to gcc (builds standalone)" ; exit 1 ;;
+    h) echo -e "\nUsage: $0 [-a] [-y] [-s] [-r] [-p]\n-a | autorun    | autoruns the built executable\n-y | yesconsole | shows the console (removes -mwindows flag, which is on by default here)\n-s | static     | builds as standalone (adds -static flag)\n-r | release    | builds for release\n-p | profile    | builds for future profiling" ; exit 1 ;;
     \?) echo "Invalid option. See the help menu with '-h'" >&2; exit 1;;
   esac
 done
