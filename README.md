@@ -1,3 +1,5 @@
+![plainIMG banner](examples/plainIMG_banner2.png)
+
 # [plainIMG2 (plainIMG)](https://github.com/qaptivator/plainimg2)
 
 _as simple as it gets for an image viewer_
@@ -10,6 +12,9 @@ _as simple as it gets for an image viewer_
 
 2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!)
 3. lightweight (the executable is under 3MB!)
+
+![plainIMG size](examples/plainIMG_size.png)
+
 4. you can drag the window around using the actual window (the client area) instead of just the title bar!
 5. other oddly specific features which arent available in most other image viewers, such as toggling antialiasing (see crisp pixels), stretching images and more.
 
