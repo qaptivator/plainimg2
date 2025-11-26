@@ -4,29 +4,34 @@
 
 _as simple as it gets for an image viewer_
 
+plainIMG is a distraction-free **image viewer**.<br />
+no toolbars, **no clutter**, no AI -- just the image.<br />
+inspired by PowerToys "Always on Top", it's perfect for **pinning** reference images or artworks.<br />
+also made to deshittify Windows and embrace FOSS -- fast, lightweight, and **user-first**.
+
 # why would i use this?
 
-1. look at the comparison between plainIMG and Photos (opens images almost twice as fast!):
+1. **blazing fast:** opens images almost twice as fast as Photos app.
 
 ![plainIMG_open_comparison](examples/plainIMG_open_comparison.gif)
 
-2. the image window is pinned on top of every other window by default (no need to install PowerToys or other software!)
-3. lightweight (the executable is under 3MB!)
+2. **always on top:** opened images are pinned by default, no extra software needed.
+3. **lightweight:** the executable is under 3MB!
 
 ![plainIMG size](examples/plainIMG_size.png)
 
-4. you can drag the window around using the actual window (the client area) instead of just the title bar!
-5. other oddly specific features which arent available in most other image viewers, such as toggling antialiasing (see crisp pixels), stretching images and more.
+4. **smart window draging:** you can drag the window around using the actual window (the client area) instead of just the title bar!
+5. **pixel-perfect features:** toggle antialiasing, stretch images, and more. ideal for pixel art.
 
-# who would use this?
+# who is this for?
 
-- pixel art artists, working with low resolution images
 - developers wanting to pin important info or graphs during development
 - students wanting to pin cheatsheets or charts during study
+- pixel art artists, working with low resolution images
 
 # usage
 
-- **install the installer from the latest release. (`plainIMG_vN.N.N_installer.exe`)**
+- **install the installer from the latest release. (`plainIMG_vX.X.X_installer.exe`)**
 - run it and it will install the app, and also add plainIMG to start menu. if you click the "Set plainIMG as the default image viewer" option, jpg, jpeg, png and bmp file extensions will be associated with plainIMG.
 - now that it is installed, you can open an image, select plainIMG and click "Always".
 - alternatively, you can go to settings, default apps, and set common image formats to plainIMG.
@@ -41,6 +46,16 @@ to make the window be the size of the image, press `R`.
 to make the window be over other windows and also dont go behind other windows when unfocused, press `T`. _this is enabled by default._  
 to see the rest of the features, look down below.  
 to support the developer, you can appreciate the project by giving it a star in the GitHub repository. thanks!
+
+# hotkeys
+
+- `Right Click` → menu
+- `Q` / `ESC` / close window → quit
+- `R` → resize window to image
+- `T` → toggle always-on-top (default ON)
+- `A` → maintain aspect ratio (default ON)
+- `B` → black background for PNGs
+- `L` → toggle antialiasing
 
 # all of the features
 
@@ -65,7 +80,7 @@ to support the developer, you can appreciate the project by giving it a star in 
 
 # screenshots
 
-when you start up plainIMG without giving it an image
+start screen
 
 ![screenshot1](examples/screenshot1.png)
 
@@ -73,7 +88,7 @@ in black background mode
 
 ![screenshot2](examples/screenshot2.png)
 
-example of showing an image
+opened image
 
 ![screenshot3](examples/screenshot3.png)
 
