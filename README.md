@@ -31,7 +31,7 @@ also made to deshittify Windows and embrace FOSS -- fast, lightweight, and **use
 
 # usage
 
-- **install the installer from the latest release. (`plainIMG_vX.X.X_installer.exe`)**
+- **install the installer from the latest release. (`plainIMG_vX.Y.Z_installer.exe`)**
 - run it and it will install the app, and also add plainIMG to start menu. if you click the "Set plainIMG as the default image viewer" option, jpg, jpeg, png and bmp file extensions will be associated with plainIMG.
 - now that it is installed, you can open an image, select plainIMG and click "Always".
 - alternatively, you can go to settings, default apps, and set common image formats to plainIMG.
